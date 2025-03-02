@@ -1,6 +1,5 @@
 
-
-import 'package:expense_tracker/screen/pin_screen.dart';
+import 'package:expense_tracker/screen/onboard.dart';
 import 'package:expense_tracker/widgets/custom_paint.dart';
 
 import 'package:flutter/material.dart';
@@ -23,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
     // Timer to navigate to the next screen after showing splash screen
     Timer(const Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const PinScreen()),
+        MaterialPageRoute(builder: (context) => const OnBoard()),
       );
     });
   }
