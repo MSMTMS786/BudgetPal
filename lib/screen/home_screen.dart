@@ -1,8 +1,9 @@
+import 'package:expense_tracker/screen/addtransaction_screen.dart';
 import 'package:expense_tracker/widgets/Drawer.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({Key? key}) : super(key: key);
+  HomeScreen({super.key});
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -167,11 +168,7 @@ class HomeScreen extends StatelessWidget {
                         amount: '-₹83',
                         color: Colors.purple,
                       ),
-                      FloatingActionButton(
-                        onPressed: () {},
-                        child: Icon(Icons.add, color: Color(0xFF1A1A2E)),
-                        backgroundColor: Color(0xFFFFD700),
-                      ),
+                      
                     ],
                   ),
                 ),
@@ -188,9 +185,18 @@ class HomeScreen extends StatelessWidget {
                     _buildNavItem(Icons.account_balance_wallet, false),
                     _buildNavItem(Icons.bar_chart, false),
                     _buildNavItem(Icons.person, false),
+                     FloatingActionButton(
+                        
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionEntryScreen()));
+                        },
+                        backgroundColor: Color(0xFFFFD700),
+                        child: Icon(Icons.add, color: Color(0xFF1A1A2E)),
+                      ),
                   ],
                 ),
               ),
+             
             ],
           ),
         ),
