@@ -1,8 +1,6 @@
-import 'package:expense_tracker/screen/home_screen.dart';
 import 'package:expense_tracker/screen/pin_screen.dart';
 import 'package:expense_tracker/widgets/onboard_content.dart' show contents;
 import 'package:flutter/material.dart';
-
 
 class OnBoard extends StatefulWidget {
   const OnBoard({super.key});
@@ -23,6 +21,7 @@ class _OnBoardState extends State<OnBoard> {
 
   @override
   void dispose() {
+    super.dispose();
     _controller.dispose();
   }
 
@@ -33,43 +32,33 @@ class _OnBoardState extends State<OnBoard> {
         children: [
           Expanded(
             child: PageView.builder(
-                controller: _controller,
-                itemCount: contents.length,
-                onPageChanged: (int index) {
-                  setState(() {
-                    currentIndex = index;
-                  });
-                },
-                itemBuilder: (_, i) {
-                  return Padding(
-                    padding:
-                        const EdgeInsets.only(top: 30, left: 20, right: 20),
-                    child: Column(
-                      children: [
-                        Image.asset(
-                          contents[i].image,
-                          height: 400,
-                          width: MediaQuery.of(context).size.width,
-                          fit: BoxFit.fill,
-                        ),
-                        const SizedBox(
-                          height: 40,
-                        ),
-                        Text(
-                          contents[i].title,
-                          style: TextStyle(),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Text(
-                          contents[i].description,
-                          style: TextStyle(),
-                        )
-                      ],
-                    ),
-                  );
-                }),
+              controller: _controller,
+              itemCount: contents.length,
+              onPageChanged: (int index) {
+                setState(() {
+                  currentIndex = index;
+                });
+              },
+              itemBuilder: (_, i) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 30, left: 20, right: 20),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        contents[i].image,
+                        height: 400,
+                        width: MediaQuery.of(context).size.width,
+                        fit: BoxFit.fill,
+                      ),
+                      const SizedBox(height: 40),
+                      Text(contents[i].title, style: TextStyle()),
+                      const SizedBox(height: 20),
+                      Text(contents[i].description, style: TextStyle()),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
           Container(
             child: Row(
@@ -82,38 +71,38 @@ class _OnBoardState extends State<OnBoard> {
           ),
           GestureDetector(
             onTap: () {
-                if (currentIndex == contents.length - 1) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>  PinScreen(),
-                    ),
-                  );
-                }
-                _controller.nextPage(
-                    duration: const Duration(milliseconds: 100),
-                    curve: Curves.bounceIn);
-              },
+              if (currentIndex == contents.length - 1) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => PinScreen()),
+                );
+              }
+              _controller.nextPage(
+                duration: const Duration(milliseconds: 100),
+                curve: Curves.bounceIn,
+              );
+            },
             child: Container(
               decoration: BoxDecoration(
-                  color: Colors.red, borderRadius: BorderRadius.circular(15)),
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(15),
+              ),
               height: 60,
               width: double.infinity,
               margin: const EdgeInsets.all(40),
-              
-                
-                child: Center(
-                  child: Text(
-                    currentIndex == contents.length - 1 ? "Start" : "Next",
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
+
+              child: Center(
+                child: Text(
+                  currentIndex == contents.length - 1 ? "Start" : "Next",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-             
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -125,7 +114,9 @@ class _OnBoardState extends State<OnBoard> {
       width: currentIndex == index ? 18 : 7,
       margin: const EdgeInsets.only(right: 5),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(6), color: Colors.black38),
+        borderRadius: BorderRadius.circular(6),
+        color: Colors.black38,
+      ),
     );
   }
 }

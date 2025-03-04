@@ -1,9 +1,9 @@
-import 'package:expense_tracker/screen/addtransaction_screen.dart';
 import 'package:expense_tracker/widgets/Drawer.dart';
+import 'package:expense_tracker/widgets/bottomNavBar.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
+  HomeScreen({Key? key}) : super(key: key);
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -168,35 +168,18 @@ class HomeScreen extends StatelessWidget {
                         amount: '-₹83',
                         color: Colors.purple,
                       ),
-                      
+                      FloatingActionButton(
+                        onPressed: () {},
+                        child: Icon(Icons.add, color: Color(0xFF1A1A2E)),
+                        backgroundColor: Color(0xFFFFD700),
+                      ),
                     ],
                   ),
                 ),
               ),
-
+          
               // Bottom Navigation Bar
-              Container(
-                height: 70,
-                color: Colors.transparent,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildNavItem(Icons.home, true),
-                    _buildNavItem(Icons.account_balance_wallet, false),
-                    _buildNavItem(Icons.bar_chart, false),
-                    _buildNavItem(Icons.person, false),
-                     FloatingActionButton(
-                        
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => TransactionEntryScreen()));
-                        },
-                        backgroundColor: Color(0xFFFFD700),
-                        child: Icon(Icons.add, color: Color(0xFF1A1A2E)),
-                      ),
-                  ],
-                ),
-              ),
-             
+              BottomNavBar(),
             ],
           ),
         ),
@@ -324,28 +307,20 @@ class HomeScreen extends StatelessWidget {
   }
 
   // Helper method to build navigation items
-  Widget _buildNavItem(IconData icon, bool isSelected) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          icon,
-          color: isSelected ? const Color(0xFFFFD700) : Colors.grey,
-          size: 24,
-        ),
-        const SizedBox(height: 4),
-        if (isSelected)
-          Container(
-            width: 20,
-            height: 3,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFD700),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-      ],
-    );
-  }
+  // Widget _buildNavItem(IconData icon, bool isActive) {
+  //   return Container(
+  //     width: 50,
+  //     height: 50,
+  //     decoration: BoxDecoration(
+  //       color: isActive ? Color(0xFFFFD700) : Colors.transparent,
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: Icon(
+  //       icon,
+  //       color: isActive ? Color(0xFF1A1A2E) : Colors.white,
+  //     ),
+  //   );
+  // }
 }
 
 // Custom painter for the gauge
