@@ -1,3 +1,4 @@
+import 'package:expense_tracker/widgets/custom_paint.dart';
 import 'package:flutter/material.dart';
 
 class AddTransactionScreen extends StatefulWidget {
@@ -69,7 +70,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               underline: Container(),
               icon: const Icon(Icons.keyboard_arrow_down, color: Colors.amber),
               style: const TextStyle(color: Colors.amber),
-              hint: const Text("Payment Method", style: TextStyle(color: Colors.amber)),
+              hint: const Text(
+                "Payment Method",
+                style: TextStyle(color: Colors.amber),
+              ),
               onChanged: (value) {},
               items: const [
                 DropdownMenuItem(value: "cash", child: Text("Cash")),
@@ -120,7 +124,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: !isIncome ? Colors.orange : Colors.transparent,
+                            color:
+                                !isIncome ? Colors.orange : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           alignment: Alignment.center,
@@ -139,40 +144,59 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               ),
 
               // Category Dropdown
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  dropdownColor: const Color(0xFF1F1D2B),
-                  underline: Container(),
-                  icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white70),
-                  style: const TextStyle(color: Colors.white),
-                  hint: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
+              isIncome == false
+                  ? Container(
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 16,
                     ),
-                    child: const Text(
-                      "Category",
-                      style: TextStyle(color: Colors.white70),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      dropdownColor: const Color(0xFF1F1D2B),
+                      underline: Container(),
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Colors.white70,
+                      ),
+                      style: const TextStyle(color: Colors.white),
+                      hint: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Text(
+                          "Category",
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                      ),
+                      value: selectedCategory,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCategory = value;
+                        });
+                      },
+                      items: const [
+                        DropdownMenuItem(value: "food", child: Text("Food")),
+                        DropdownMenuItem(
+                          value: "transport",
+                          child: Text("Transport"),
+                        ),
+                        DropdownMenuItem(
+                          value: "shopping",
+                          child: Text("Shopping"),
+                        ),
+                        DropdownMenuItem(
+                          value: "entertainment",
+                          child: Text("Entertainment"),
+                        ),
+                      ],
                     ),
-                  ),
-                  value: selectedCategory,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedCategory = value;
-                    });
-                  },
-                  items: const [
-                    DropdownMenuItem(value: "food", child: Text("Food")),
-                    DropdownMenuItem(value: "transport", child: Text("Transport")),
-                    DropdownMenuItem(value: "shopping", child: Text("Shopping")),
-                    DropdownMenuItem(value: "entertainment", child: Text("Entertainment")),
-                  ],
-                ),
-              ),
-
+                  )
+                  : const SizedBox(), // This ensures nothing is displayed when isIncome is true
               // Amount Display
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -180,7 +204,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "₹",
+                      "RS.",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 36,
@@ -202,7 +226,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
               // Description Input
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 child: TextField(
                   decoration: const InputDecoration(
                     hintText: "Add Description",
@@ -225,13 +252,24 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
               // Insert Template Button
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                height: 50,
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 60,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  gradient: CustomColors().orangeGradient,
+                ),
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
+                    backgroundColor:Colors.transparent,
                     padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: const Text(
                     "Insert Template",
@@ -246,7 +284,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   margin: const EdgeInsets.only(top: 10),
                   child: GridView.count(
                     crossAxisCount: 3,
-                    childAspectRatio: 1.5,
+                    crossAxisSpacing: 2,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 2.5,
                     children: [
                       _buildNumberButton("1"),
                       _buildNumberButton("2"),
@@ -266,15 +306,16 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               ),
             ],
           ),
-          
+
           // Add save button
           Positioned(
             bottom: 16,
             right: 16,
             child: FloatingActionButton(
+              backgroundColor: Colors.orange,
               onPressed: _saveAmountAndContinue,
-              backgroundColor: Colors.amber,
-              child: const Icon(Icons.check),
+             
+              child: const Icon(Icons.check,color:Colors.white,),
             ),
           ),
         ],
@@ -283,15 +324,23 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   Widget _buildNumberButton(String digit) {
-    return InkWell(
+    return GestureDetector(
+    
       onTap: () => _addDigit(digit),
       child: Container(
+        padding: EdgeInsets.all(10),
+         decoration: BoxDecoration(
+        
+          shape: BoxShape.circle,
+          color: Colors.white.withOpacity(0.1),
+        ),
+   
         alignment: Alignment.center,
         child: Text(
           digit,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 28,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -300,10 +349,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   Widget _buildDeleteButton() {
-    return InkWell(
+    return GestureDetector(
       onTap: _deleteDigit,
       child: Container(
         alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.red,
+        ),
         child: const Icon(
           Icons.backspace_outlined,
           color: Colors.white,
