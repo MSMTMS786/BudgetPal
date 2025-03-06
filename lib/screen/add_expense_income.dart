@@ -273,7 +273,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ),
                   child: const Text(
                     "Insert Template",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
               ),
@@ -286,7 +286,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     crossAxisCount: 3,
                     crossAxisSpacing: 2,
                     mainAxisSpacing: 10,
-                    childAspectRatio: 2.5,
+                    childAspectRatio: 1.5,
                     children: [
                       _buildNumberButton("1"),
                       _buildNumberButton("2"),

@@ -1,4 +1,4 @@
-import 'package:expense_tracker/screen/add_expense_income.dart';
+
 import 'package:expense_tracker/screen/splash_screen.dart';
 
 import 'package:flutter/material.dart';
