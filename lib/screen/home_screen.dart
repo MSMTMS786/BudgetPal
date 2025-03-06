@@ -1,3 +1,4 @@
+import 'package:expense_tracker/screen/add_expense_income.dart';
 import 'package:expense_tracker/widgets/Drawer.dart';
 import 'package:expense_tracker/widgets/bottomNavBar.dart';
 import 'package:flutter/material.dart';
@@ -169,7 +170,9 @@ class HomeScreen extends StatelessWidget {
                         color: Colors.purple,
                       ),
                       FloatingActionButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => AddTransactionScreen()));
+                        },
                         child: Icon(Icons.add, color: Color(0xFF1A1A2E)),
                         backgroundColor: Color(0xFFFFD700),
                       ),
