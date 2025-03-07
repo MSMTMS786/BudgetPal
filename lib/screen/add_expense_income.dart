@@ -14,6 +14,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   String amount = "0";
   String description = "";
   String? selectedCategory;
+  String? selectedPaymentMethod;
 
   void _addDigit(String digit) {
     setState(() {
@@ -39,7 +40,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,7 +63,12 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 "Payment Method",
                 style: TextStyle(color: Colors.amber),
               ),
-              onChanged: (value) {},
+              value:selectedPaymentMethod,
+              onChanged: (value) {
+                setState(() {
+                  selectedPaymentMethod = value;
+                });
+              },
               items: const [
                 DropdownMenuItem(value: "cash", child: Text("Cash")),
                 DropdownMenuItem(value: "card", child: Text("Card")),
@@ -140,6 +145,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       horizontal: 16,
                     ),
                     child: DropdownButton<String>(
+                      padding:EdgeInsets.all(10) ,
+                      borderRadius: BorderRadius.circular(15),
+                      focusColor: Colors.redAccent,
                       isExpanded: true,
                       dropdownColor: const Color(0xFF1F1D2B),
                       underline: Container(),
@@ -189,27 +197,30 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               // Amount Display
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "RS.",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "RS.",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      amount,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(width: 10),
+                      Text(
+                        amount,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
 
@@ -242,20 +253,16 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               // Insert Template Button
               Container(
                 height: 50,
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 50,
-                ),
+                margin: const EdgeInsets.symmetric(horizontal: 50),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   gradient: CustomColors().orangeGradient,
                 ),
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -298,30 +305,27 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           ),
 
           // Add save button
-         
         ],
       ),
     );
   }
 
   Widget _buildNumberButton(String digit) {
-    return GestureDetector(
-    
+    return InkResponse(
       onTap: () => _addDigit(digit),
       child: Container(
         padding: EdgeInsets.all(10),
-         decoration: BoxDecoration(
-        
+        decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withOpacity(0.3),
         ),
-   
+
         alignment: Alignment.center,
         child: Text(
           digit,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -330,14 +334,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   Widget _buildDeleteButton() {
-    return GestureDetector(
+    return InkResponse(
       onTap: _deleteDigit,
       child: Container(
         alignment: Alignment.center,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.red,
-        ),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.red),
         child: const Icon(
           Icons.backspace_outlined,
           color: Colors.white,

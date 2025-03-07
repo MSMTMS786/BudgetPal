@@ -105,20 +105,37 @@ class HomeScreen extends StatelessWidget {
             
 
               // My Transactions Text
-              Container(
-                child: const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text(
-                    'My transactions',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
+               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+               
+
+                 children: [
+                   const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Text(
+                        'My transactions',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20.0),
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => AddTransactionScreen()));
+                      },
+                      backgroundColor: Color(0xFFFFD700),
+                      child: Icon(Icons.add, color:Colors.white),
                     ),
                   ),
-                ),
-              ),
+                 ],
+               ),
 
+              
+           
               // Transaction List
               Container(
                 child: Expanded(
@@ -170,18 +187,12 @@ class HomeScreen extends StatelessWidget {
                         amount: '-₹83',
                         color: Colors.purple,
                       ),
-                      FloatingActionButton(
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => AddTransactionScreen()));
-                        },
-                        child: Icon(Icons.add, color: Color(0xFF1A1A2E)),
-                        backgroundColor: Color(0xFFFFD700),
-                      ),
+                      
                     ],
                   ),
                 ),
               ),
-          
+              
               // Bottom Navigation Bar
               BottomNavBar(),
             ],
