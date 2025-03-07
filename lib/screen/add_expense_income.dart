@@ -2,9 +2,10 @@ import 'package:expense_tracker/widgets/custom_paint.dart';
 import 'package:flutter/material.dart';
 
 class AddTransactionScreen extends StatefulWidget {
-  const AddTransactionScreen({Key? key}) : super(key: key);
+  const AddTransactionScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _AddTransactionScreenState createState() => _AddTransactionScreenState();
 }
 
@@ -38,18 +39,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     });
   }
 
-  void _saveAmountAndContinue() {
-    // Navigate to the edit screen and pass necessary data
-    Navigator.pushReplacementNamed(
-      context,
-      '/editTransaction',
-      arguments: {
-        'isExpense': !isIncome,
-        'amount': amount,
-        // Add other data as needed
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +188,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   : const SizedBox(), // This ensures nothing is displayed when isIncome is true
               // Amount Display
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -254,8 +243,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               Container(
                 height: 50,
                 margin: const EdgeInsets.symmetric(
-                  horizontal: 60,
-                  vertical: 10,
+                  horizontal: 50,
                 ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
@@ -263,7 +251,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor:Colors.transparent,
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -272,7 +262,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     ),
                   ),
                   child: const Text(
-                    "Insert Template",
+                    "Tap to ADD",
                     style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
@@ -308,16 +298,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           ),
 
           // Add save button
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: FloatingActionButton(
-              backgroundColor: Colors.orange,
-              onPressed: _saveAmountAndContinue,
-             
-              child: const Icon(Icons.check,color:Colors.white,),
-            ),
-          ),
+         
         ],
       ),
     );
