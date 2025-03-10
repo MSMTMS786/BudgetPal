@@ -44,23 +44,23 @@ class _BottomNavBarState extends State<BottomNavBar> {
       },
       items: const [
         BottomNavigationBarItem(
-
-          icon: Icon(Icons.home),
+          
+          icon: Icon(Icons.home,color: Color(0xFF3F0D49)),
            label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.account_balance_wallet),
+          icon: Icon(Icons.account_balance_wallet,color: Color(0xFF3F0D49)),
           label: 'Account',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.bar_chart),
+          icon: Icon(Icons.bar_chart,color: Color(0xFF3F0D49)),
           label: 'Stats',
         ),
-        BottomNavigationBarItem(icon:  Icon(Icons.person),
+        BottomNavigationBarItem(icon:  Icon(Icons.person,color: Color(0xFF3F0D49)),
           label: 'Profile',
         ),
       ],
-      selectedItemColor: const Color.fromARGB(255, 86, 148, 255),
+      selectedItemColor: const Color(0xFF3F0D49),
       unselectedItemColor: Colors.grey,
      
     );

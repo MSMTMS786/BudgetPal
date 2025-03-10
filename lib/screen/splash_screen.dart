@@ -1,12 +1,9 @@
-
-import 'package:expense_tracker/screen/home_screen.dart';
 import 'package:expense_tracker/screen/pin_screen.dart';
 import 'package:expense_tracker/widgets/custom_paint.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 // Assuming you'll navigate to a home screen after the splash
-
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -21,9 +18,9 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     // Timer to navigate to the next screen after showing splash screen
     Timer(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) =>  PinScreen()),
-      );
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (context) => PinScreen()));
     });
   }
 
@@ -58,12 +55,9 @@ class _SplashScreenState extends State<SplashScreen> {
                     child: Container(
                       height: 80,
                       width: 80,
-                      child: CustomPaint(
-                        painter: DollarBillPainter(),
-                      ),
+                      child: CustomPaint(painter: DollarBillPainter()),
                     ),
                   ),
-                  
 
                   // Person icon
                   Positioned(

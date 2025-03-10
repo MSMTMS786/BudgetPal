@@ -63,7 +63,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 "Payment Method",
                 style: TextStyle(color: Colors.amber),
               ),
-              value:selectedPaymentMethod,
+              value: selectedPaymentMethod,
               onChanged: (value) {
                 setState(() {
                   selectedPaymentMethod = value;
@@ -145,7 +145,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       horizontal: 16,
                     ),
                     child: DropdownButton<String>(
-                      padding:EdgeInsets.all(10) ,
+                      padding: EdgeInsets.all(10),
                       borderRadius: BorderRadius.circular(15),
                       focusColor: Colors.redAccent,
                       isExpanded: true,

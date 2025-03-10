@@ -15,12 +15,13 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
-            _scaffoldKey.currentState?.openDrawer(); // Use GlobalKey to open drawer
+            _scaffoldKey.currentState
+                ?.openDrawer(); // Use GlobalKey to open drawer
           },
           icon: Icon(Icons.menu, color: Colors.white),
         ),
         backgroundColor: Color(0xFF3F0D49),
-        
+
         title: Center(
           child: Text(
             'Welcome',
@@ -30,7 +31,6 @@ class HomeScreen extends StatelessWidget {
       ),
 
       body: Container(
-        
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
@@ -40,7 +40,6 @@ class HomeScreen extends StatelessWidget {
             colors: [
               Color(0xFF3F0D49), // Purple at top
               Color(0xFF1A1A2E), // Dark blue at bottom
-              
             ],
           ),
         ),
@@ -92,50 +91,50 @@ class HomeScreen extends StatelessWidget {
               // Percentage Gauges
               Container(
                 height: 100,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildGauge('29%', Colors.purple),
-                      _buildGauge('61%', Colors.cyan),
-                      _buildGauge('46%', Colors.orange),
-                    ],
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildGauge('29%', Colors.purple),
+                    _buildGauge('61%', Colors.cyan),
+                    _buildGauge('46%', Colors.orange),
+                  ],
                 ),
-                
-            
+              ),
 
               // My Transactions Text
-               Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-               
 
-                 children: [
-                   const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Text(
-                        'My transactions',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text(
+                      'My transactions',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(right: 20.0),
                     child: FloatingActionButton(
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => AddTransactionScreen()));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddTransactionScreen(),
+                          ),
+                        );
                       },
                       backgroundColor: Color(0xFFFFD700),
-                      child: Icon(Icons.add, color:Colors.white),
+                      child: Icon(Icons.add, color: Colors.white),
                     ),
                   ),
-                 ],
-               ),
+                ],
+              ),
 
-              
-           
               // Transaction List
               Container(
                 child: Expanded(
@@ -187,12 +186,11 @@ class HomeScreen extends StatelessWidget {
                         amount: '-₹83',
                         color: Colors.purple,
                       ),
-                      
                     ],
                   ),
                 ),
               ),
-              
+
               // Bottom Navigation Bar
               BottomNavBar(),
             ],
