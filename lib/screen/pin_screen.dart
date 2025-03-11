@@ -1,4 +1,3 @@
-
 import 'package:expense_tracker/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +18,7 @@ class _PinScreenState extends State<PinScreen> {
       if (currentPin.length < pinLength) {
         currentPin += number;
       }
-      
+
       // If pin is complete, you can add validation logic here
       if (currentPin.length == pinLength) {
         // For example: validate PIN and navigate to next screen
@@ -64,7 +63,7 @@ class _PinScreenState extends State<PinScreen> {
             children: [
               // Status bar space
               const SizedBox(height: 40),
-              
+
               // Enter Pin text
               const Text(
                 'Enter Pin',
@@ -75,9 +74,9 @@ class _PinScreenState extends State<PinScreen> {
                   letterSpacing: 1.2,
                 ),
               ),
-              
+
               const SizedBox(height: 50),
-              
+
               // PIN dots indicator
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -89,17 +88,18 @@ class _PinScreenState extends State<PinScreen> {
                     height: 12,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: index < currentPin.length 
-                          ? Colors.white 
-                          : Colors.white.withOpacity(0.5),
+                      color:
+                          index < currentPin.length
+                              ? Colors.white
+                              : Colors.white.withOpacity(0.5),
                     ),
                   ),
                 ),
               ),
-              
+
               // Spacer
               const Spacer(),
-              
+
               // Number pad
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -115,7 +115,7 @@ class _PinScreenState extends State<PinScreen> {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // Row 2: 4, 5, 6
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -126,7 +126,7 @@ class _PinScreenState extends State<PinScreen> {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // Row 3: 7, 8, 9
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -137,17 +137,17 @@ class _PinScreenState extends State<PinScreen> {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // Row 4: empty, 0, backspace
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         // Empty space for alignment
                         const SizedBox(width: 60),
-                        
+
                         // 0 button
                         _buildNumberButton('0'),
-                        
+
                         // Backspace button
                         GestureDetector(
                           onTap: _handleBackspace,
@@ -167,7 +167,7 @@ class _PinScreenState extends State<PinScreen> {
                   ],
                 ),
               ),
-              
+
               // Bottom space
               const SizedBox(height: 70),
             ],
@@ -223,13 +223,7 @@ class HomeScreenWithPin extends StatelessWidget {
             ],
           ),
         ),
-        child: Column(
-          
-          children: [
-            const PinScreen(),
-            
-          ],
-        ),
+        child: Column(children: [const PinScreen()]),
       ),
     );
   }

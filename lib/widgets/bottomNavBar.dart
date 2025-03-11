@@ -13,11 +13,7 @@ class BottomNavBar extends StatefulWidget {
 class _BottomNavBarState extends State<BottomNavBar> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
-    HomeScreen(),
-    
-    PinScreen(),
-  ];
+  final List<Widget> _screens = [HomeScreen(), PinScreen()];
 
   void _onItemTapped(int index) {
     if (_selectedIndex != index) {
@@ -31,6 +27,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
+      backgroundColor: Colors.black,
       // showSelectedLabels: true,
       showUnselectedLabels: false,
       // fixedColor: Colors.black,
@@ -44,25 +41,24 @@ class _BottomNavBarState extends State<BottomNavBar> {
       },
       items: const [
         BottomNavigationBarItem(
-          
-          icon: Icon(Icons.home,color: Color(0xFF3F0D49)),
-           label: 'Home',
+          icon: Icon(Icons.home, color: Color(0xFF3F0D49)),
+          label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.account_balance_wallet,color: Color(0xFF3F0D49)),
+          icon: Icon(Icons.account_balance_wallet, color: Color(0xFF3F0D49)),
           label: 'Account',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.bar_chart,color: Color(0xFF3F0D49)),
+          icon: Icon(Icons.bar_chart, color: Color(0xFF3F0D49)),
           label: 'Stats',
         ),
-        BottomNavigationBarItem(icon:  Icon(Icons.person,color: Color(0xFF3F0D49)),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person, color: Color(0xFF3F0D49)),
           label: 'Profile',
         ),
       ],
       selectedItemColor: const Color(0xFF3F0D49),
       unselectedItemColor: Colors.grey,
-     
     );
   }
 }
