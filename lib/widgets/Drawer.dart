@@ -66,7 +66,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   ),
                   _buildDrawerItem(Icons.lock, 'CVV', context),
                   _buildDrawerItem(Icons.list, 'Lists', context),
-                  _buildDrawerItem(Icons.settings, 'Settings', context),
+                  _buildDrawerItem(Icons.settings, 'Setting', context),
                 ],
               ),
             ),
