@@ -7,9 +7,10 @@ import 'dart:async';
 // Assuming you'll navigate to a home screen after the splash
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SplashScreenState createState() => _SplashScreenState();
 }
 
@@ -21,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Timer(const Duration(seconds: 3), () {
       Navigator.of(
         context,
-      ).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
+      ).pushReplacement(MaterialPageRoute(builder: (context) => PinScreen()));
     });
   }
 
