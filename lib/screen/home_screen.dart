@@ -1,10 +1,31 @@
+import 'package:expense_tracker/model/model.dart';
 import 'package:expense_tracker/screen/add_expense_income.dart';
 import 'package:expense_tracker/widgets/Drawer.dart';
 import 'package:expense_tracker/widgets/bottomNavBar.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  double balance = 0.0; // Initial balance
+  List<Transaction> transactions = [];
+
+  void updateBalance(Transaction transaction) {
+    setState(() {
+      if (transaction.isExpense) {
+        balance -= transaction.amount;
+      } else {
+        balance += transaction.amount;
+      }
+      transactions.add(transaction);
+    });
+  }
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -63,7 +84,7 @@ class HomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Center(
                       child: Text(
                         'Available Balance',
@@ -76,7 +97,7 @@ class HomeScreen extends StatelessWidget {
                     SizedBox(height: 8),
                     Center(
                       child: Text(
-                        '₹1,05,284',
+                        "RS${balance.toStringAsFixed(2)}",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 28,
@@ -117,78 +138,84 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 20.0),
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddTransactionScreen(),
-                          ),
-                        );
-                      },
-                      backgroundColor: Color(0xFFFFD700),
-                      child: Icon(Icons.add, color: Colors.white),
-                    ),
+                  FloatingActionButton(
+                    onPressed: () async {
+                      final result = await Navigator.push<Transaction>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AddTransactionScreen(),
+                        ),
+                      );
+
+                      if (result != null) {
+                        updateBalance(result);
+                      }
+                    },
+                    backgroundColor: Colors.orange,
+                    child: const Icon(Icons.add),
                   ),
                 ],
               ),
 
               // Transaction List
-              Container(
-                child: Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    children: [
-                      _buildTransactionItem(
-                        icon: null,
-                        fallbackIcon: 'S',
-                        fallbackColor: Colors.red,
-                        name: 'Shell',
-                        date: 'Sep 02, 2022',
-                        amount: '-₹45',
-                        color: Colors.orange,
-                      ),
-                      _buildTransactionItem(
-                        icon: null,
-                        fallbackIcon: 'S',
-                        fallbackColor: Colors.pink[100]!,
-                        name: 'SM Supermart',
-                        date: 'Sep 01, 2022',
-                        amount: '-₹235',
-                        color: Colors.cyan,
-                      ),
-                      _buildTransactionItem(
-                        icon: null,
-                        fallbackIcon: 'M',
-                        fallbackColor: Colors.green[200]!,
-                        name: 'Mango Store',
-                        date: 'Mar 02, 2035',
-                        amount: '-₹564',
-                        color: Colors.orange,
-                      ),
-                      _buildTransactionItem(
-                        icon: null,
-                        fallbackIcon: 'P',
-                        fallbackColor: Colors.green[200]!,
-                        name: 'PinelabsPOS',
-                        date: 'Aug 31, 2022',
-                        amount: '-₹164',
-                        color: Colors.orange,
-                      ),
-                      _buildTransactionItem(
-                        icon: null,
-                        fallbackIcon: 'A',
-                        fallbackColor: Colors.white,
-                        name: 'AMAZON',
-                        date: 'Aug 31, 2022',
-                        amount: '-₹83',
-                        color: Colors.purple,
-                      ),
-                    ],
-                  ),
-                ),
+              Expanded(
+                child:
+                    transactions.isEmpty
+                        ? const Center(
+                          child: Text(
+                            'No transactions yet',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        )
+                        : ListView.builder(
+                          itemCount: transactions.length,
+                          itemBuilder: (context, index) {
+                            final transaction =
+                                transactions[transactions.length - 1 - index];
+                            return Container(
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.grey.withOpacity(0.2),
+                                ),
+                              ),
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor:
+                                      transaction.isExpense
+                                          ? Colors.orange.withOpacity(0.1)
+                                          : Colors.green.withOpacity(0.1),
+                                  child: Icon(
+                                    transaction.isExpense
+                                        ? Icons.remove
+                                        : Icons.add,
+                                    color:
+                                        transaction.isExpense
+                                            ? Colors.orange
+                                            : Colors.green,
+                                  ),
+                                ),
+                                title: Text(transaction.category),
+                                subtitle: Text(transaction.description),
+                                trailing: Text(
+                                  '${transaction.isExpense ? '-' : '+'} ₹${transaction.amount.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    color:
+                                        transaction.isExpense
+                                            ? Colors.red
+                                            : Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
               ),
 
               // Bottom Navigation Bar
@@ -318,22 +345,6 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
-  // Helper method to build navigation items
-  // Widget _buildNavItem(IconData icon, bool isActive) {
-  //   return Container(
-  //     width: 50,
-  //     height: 50,
-  //     decoration: BoxDecoration(
-  //       color: isActive ? Color(0xFFFFD700) : Colors.transparent,
-  //       borderRadius: BorderRadius.circular(12),
-  //     ),
-  //     child: Icon(
-  //       icon,
-  //       color: isActive ? Color(0xFF1A1A2E) : Colors.white,
-  //     ),
-  //   );
-  // }
 }
 
 // Custom painter for the gauge
