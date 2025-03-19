@@ -1,7 +1,6 @@
 import 'package:expense_tracker/model/model.dart';
 import 'package:expense_tracker/screen/add_expense_income.dart';
 import 'package:expense_tracker/widgets/Drawer.dart';
-import 'package:expense_tracker/widgets/bottomNavBar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -36,13 +35,13 @@ class _HomeScreenState extends State<HomeScreen> {
   // **Dynamically Calculate Graph Values**
   double get expensePercentage => balance == 0.0 ? 0.0 : (totalExpenses / (totalExpenses + totalIncome));
   double get incomePercentage => balance == 0.0 ? 0.0 : (totalIncome / (totalExpenses + totalIncome));
-  double get savingsPercentage => balance == 0.0 ? 1.0 : ((balance - totalExpenses) / balance);
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: MyDrawer(),
+      drawer: MyDrawer(transactions: transactions,),
       appBar: AppBar(
         backgroundColor: const Color(0xFF3F0D49),
         title: const Text('Expense Tracker', style: TextStyle(color: Colors.white)),
@@ -88,8 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     _buildGraph("Expenses", expensePercentage, Colors.red),
                     const SizedBox(height: 10),
                     _buildGraph("Income", incomePercentage, Colors.green),
-                    const SizedBox(height: 10),
-                    _buildGraph("Savings", savingsPercentage, Colors.blue),
+                   
                   ],
                 ),
               ),
@@ -139,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               // **Bottom Navigation Bar**
-              BottomNavBar(),
+             
             ],
           ),
         ),

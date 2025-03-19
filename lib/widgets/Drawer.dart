@@ -1,6 +1,14 @@
+import 'package:expense_tracker/screen/transaction_history.dart';
 import 'package:flutter/material.dart';
+import 'package:expense_tracker/model/model.dart';
+// Import your transactions list screen
+
 
 class MyDrawer extends StatefulWidget {
+  final List<Transaction> transactions;
+  
+  const MyDrawer({Key? key, required this.transactions}) : super(key: key);
+  
   @override
   State<MyDrawer> createState() => _MyDrawerState();
 }
@@ -9,7 +17,6 @@ class _MyDrawerState extends State<MyDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      
       child: Container(
         color: Color(0xFF121329), // Dark background color
         child: Column(
@@ -52,21 +59,109 @@ class _MyDrawerState extends State<MyDrawer> {
                     Icons.workspace_premium,
                     'Get Premium',
                     context,
+                    () {
+                      Navigator.pop(context);
+                      // Navigate to Premium screen
+                    },
                   ),
-                  _buildDrawerItem(Icons.insert_chart, 'Records', context),
-                  _buildDrawerItem(Icons.account_balance, 'Bank Sync', context),
-                  _buildDrawerItem(Icons.upload_file, 'Imports', context),
-                  _buildDrawerItem(Icons.receipt, 'Receipts', context),
-                  _buildDrawerItem(Icons.label, 'Tags', context),
-                  _buildDrawerItem(Icons.credit_card, 'Cards', context),
+                  _buildDrawerItem(
+                    Icons.insert_chart, 
+                    'Records', 
+                    context,
+                    () {
+                      Navigator.pop(context);
+                      // Navigate to Records screen
+                    },
+                  ),
+                  _buildDrawerItem(
+                    Icons.account_balance, 
+                    'Bank Sync', 
+                    context,
+                    () {
+                      Navigator.pop(context);
+                      // Navigate to Bank Sync screen
+                    },
+                  ),
+                  _buildDrawerItem(
+                    Icons.upload_file, 
+                    'Imports', 
+                    context,
+                    () {
+                      Navigator.pop(context);
+                      // Navigate to Imports screen
+                    },
+                  ),
+                  _buildDrawerItem(
+                    Icons.receipt, 
+                    'Receipts', 
+                    context,
+                    () {
+                      Navigator.pop(context);
+                      // Navigate to Transactions List Screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TransactionsListScreen(
+                            transactions: widget.transactions,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    Icons.label, 
+                    'Tags', 
+                    context,
+                    () {
+                      Navigator.pop(context);
+                      // Navigate to Tags screen
+                    },
+                  ),
+                  _buildDrawerItem(
+                    Icons.credit_card, 
+                    'Cards', 
+                    context,
+                    () {
+                      Navigator.pop(context);
+                      // Navigate to Cards screen
+                    },
+                  ),
                   _buildDrawerItem(
                     Icons.account_balance_wallet,
                     'Set Budget',
                     context,
+                    () {
+                      Navigator.pop(context);
+                      // Navigate to Budget screen
+                    },
                   ),
-                  _buildDrawerItem(Icons.lock, 'CVV', context),
-                  _buildDrawerItem(Icons.list, 'Lists', context),
-                  _buildDrawerItem(Icons.settings, 'Setting', context),
+                  _buildDrawerItem(
+                    Icons.lock, 
+                    'CVV', 
+                    context,
+                    () {
+                      Navigator.pop(context);
+                      // Navigate to CVV screen
+                    },
+                  ),
+                  _buildDrawerItem(
+                    Icons.list, 
+                    'Lists', 
+                    context,
+                    () {
+                      Navigator.pop(context);
+                      // Navigate to Lists screen
+                    },
+                  ),
+                  _buildDrawerItem(
+                    Icons.settings, 
+                    'Setting', 
+                    context,
+                    () {
+                      Navigator.pop(context);
+                      // Navigate to Settings screen
+                    },
+                  ),
                 ],
               ),
             ),
@@ -76,13 +171,11 @@ class _MyDrawerState extends State<MyDrawer> {
     );
   }
 
-  Widget _buildDrawerItem(IconData icon, String title, BuildContext context) {
+  Widget _buildDrawerItem(IconData icon, String title, BuildContext context, VoidCallback onTap) {
     return ListTile(
       leading: Icon(icon, color: Colors.amber),
       title: Text(title, style: TextStyle(color: Colors.white, fontSize: 16)),
-      onTap: () {
-        Navigator.pop(context);
-      },
+      onTap: onTap,
     );
   }
 }

@@ -1,5 +1,4 @@
 import 'package:expense_tracker/model/model.dart';
-import 'package:expense_tracker/widgets/custom_paint.dart';
 import 'package:flutter/material.dart';
 
 class AddTransactionScreen extends StatefulWidget {
@@ -14,7 +13,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   String description = "";
   String? selectedCategory;
   String? selectedPaymentMethod;
-  bool isIncome = false;
+  bool isIncome = true;
 
   void updateAmount(String value) {
     setState(() {
@@ -128,20 +127,32 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             style: const TextStyle(color: Colors.white),
             onChanged: (value) => setState(() => description = value),
           ),
-          
+          SizedBox(height: 16),
           // Add Button
-          ElevatedButton(
-            onPressed: _addTransaction,
-            child: const Text("Tap to ADD", style: TextStyle(color: Colors.white, fontSize: 16)),
-          ),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.06,
+            width: MediaQuery.of(context).size.width * 0.5,
+            decoration: BoxDecoration(
+              color: Color(0xFF1F1D2B),
+            ),
+            child: ElevatedButton(
           
+              style: ElevatedButton.styleFrom(
+               backgroundColor: Color(0xFF1F1D2B),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              onPressed: _addTransaction,
+              child: const Text("Tap to ADD", style: TextStyle(color: Colors.white, fontSize: 16)),
+            ),
+          ),
+          SizedBox(height: 10,),
           // Number Pad
           Expanded(
             child: GridView.count(
               crossAxisCount: 3,
               crossAxisSpacing: 2,
               mainAxisSpacing: 10,
-              childAspectRatio: 1.5,
+              childAspectRatio: 2,
               children: [
                 ...List.generate(9, (i) => _buildNumberButton((i + 1).toString())),
                 _buildNumberButton("."),
@@ -156,7 +167,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   Widget _buildNumberButton(String digit) {
-    return InkWell(
+    return GestureDetector(
       onTap: () => updateAmount(digit),
       child: Container(
         alignment: Alignment.center,
