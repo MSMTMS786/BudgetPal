@@ -14,6 +14,7 @@ class TransactionsListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF1F1D2B),
       appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: const Text(
@@ -47,24 +48,7 @@ class TransactionsListScreen extends StatelessWidget {
                 );
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.indigo,
-        child: const Icon(Icons.add),
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AddTransactionScreen(),
-            ),
-          );
-          
-          // Handle the result if needed
-          if (result != null && result is Transaction) {
-            // Add the transaction to your list
-            // This would typically be handled by a state management solution
-          }
-        },
-      ),
+      
     );
   }
 }

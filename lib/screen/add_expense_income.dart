@@ -117,17 +117,20 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 DropdownMenuItem(value: "entertainment", child: Text("Entertainment")),
               ],
             ),
-          
+          SizedBox(height: 16),
           // Amount Display
           Text("RS. $amount", style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold)),
           
           // Description Input
-          TextField(
-            decoration: const InputDecoration(hintText: "Add Description", hintStyle: TextStyle(color: Colors.grey)),
-            style: const TextStyle(color: Colors.white),
-            onChanged: (value) => setState(() => description = value),
+          Padding(
+            padding: const EdgeInsets.all(15),
+            child: TextField(
+              decoration: const InputDecoration(hintText: "Add Description", hintStyle: TextStyle(color: Colors.grey)),
+              style: const TextStyle(color: Colors.white),
+              onChanged: (value) => setState(() => description = value),
+            ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 28),
           // Add Button
           Container(
             height: MediaQuery.of(context).size.height * 0.06,
@@ -145,7 +148,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               child: const Text("Tap to ADD", style: TextStyle(color: Colors.white, fontSize: 16)),
             ),
           ),
-          SizedBox(height: 10,),
+          SizedBox(height: 30),
           // Number Pad
           Expanded(
             child: GridView.count(
