@@ -1,5 +1,4 @@
 import 'package:expense_tracker/model/model.dart';
-import 'package:expense_tracker/screen/add_expense_income.dart';
 import 'package:expense_tracker/screen/reciept_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
