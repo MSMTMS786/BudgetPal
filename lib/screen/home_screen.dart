@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: MyDrawer(transactions: transactions,),
       appBar: AppBar(
         backgroundColor: const Color(0xFF3F0D49),
-        title: const Text('Expense Tracker', style: TextStyle(color: Colors.white)),
+        title: const Text('BudgetPal', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.white),
           onPressed: () => _scaffoldKey.currentState?.openDrawer(),

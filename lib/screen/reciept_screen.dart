@@ -253,7 +253,7 @@ class ReceiptScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     alignment: Alignment.center,
                     child: const Text(
-                      'Thank you for using Expense Tracker',
+                      'Thank you for using BudgetPal!',
                       style: TextStyle(
                         color: Colors.black54,
                         fontSize: 12,
@@ -273,6 +273,7 @@ class ReceiptScreen extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: () {
                 // TODO: Implement share functionality
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Share functionality to be implemented')),
                 );
