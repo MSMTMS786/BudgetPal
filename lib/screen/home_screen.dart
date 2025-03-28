@@ -1,11 +1,12 @@
 import 'package:expense_tracker/model/model.dart';
 import 'package:expense_tracker/screen/add_expense_income.dart';
 import 'package:expense_tracker/widgets/Drawer.dart';
+import 'package:expense_tracker/model/shared_pref_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
-   const HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -19,6 +20,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  @override
+  void initState() {
+    super.initState();
+    _loadTransactions();
+  }
+
+  void _loadTransactions() async {
+    List<Transaction> loadedTransactions = await SharedPrefsHelper.loadTransactions();
+    setState(() {
+      transactions = loadedTransactions;
+      balance = transactions.fold(0.0, (sum, item) => sum + (item.isExpense ? -item.amount : item.amount));
+      totalExpenses = transactions.where((t) => t.isExpense).fold(0.0, (sum, t) => sum + t.amount);
+      totalIncome = transactions.where((t) => !t.isExpense).fold(0.0, (sum, t) => sum + t.amount);
+    });
+  }
+
   void updateBalance(Transaction transaction) {
     setState(() {
       if (transaction.isExpense) {
@@ -29,19 +46,18 @@ class _HomeScreenState extends State<HomeScreen> {
         balance += transaction.amount;
       }
       transactions.add(transaction);
+      SharedPrefsHelper.saveTransactions(transactions); // Save transactions persistently
     });
   }
 
-  // **Dynamically Calculate Graph Values**
   double get expensePercentage => balance == 0.0 ? 0.0 : (totalExpenses / (totalExpenses + totalIncome));
   double get incomePercentage => balance == 0.0 ? 0.0 : (totalIncome / (totalExpenses + totalIncome));
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: MyDrawer(transactions: transactions,),
+      drawer: MyDrawer(transactions: transactions),
       appBar: AppBar(
         backgroundColor: const Color(0xFF3F0D49),
         title: const Text('BudgetPal', style: TextStyle(color: Colors.white)),
@@ -64,8 +80,6 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             children: [
               const SizedBox(height: 20),
-
-              // **Available Balance Section**
               Center(
                 child: Column(
                   children: [
@@ -76,10 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // **Dynamic Graphs**
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
@@ -87,14 +98,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     _buildGraph("Expenses", expensePercentage, Colors.red),
                     const SizedBox(height: 10),
                     _buildGraph("Income", incomePercentage, Colors.green),
-                   
                   ],
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // **Transactions List Header**
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
@@ -107,21 +114,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                           MaterialPageRoute(builder: (context) => const AddTransactionScreen()),
                         );
-
                         if (result != null) {
                           updateBalance(result);
                         }
                       },
-                      backgroundColor: Colors.orange,
-                      child: const Icon(Icons.add),
+                      backgroundColor: Color(0xFFFFD700),
+                      child: const Icon(Icons.add,color: Colors.white),
                     ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 10),
-
-              // **Transactions List**
               Expanded(
                 child: transactions.isEmpty
                     ? const Center(
@@ -135,9 +138,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
               ),
-
-              // **Bottom Navigation Bar**
-             
             ],
           ),
         ),
@@ -145,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // **Graph Widget (Uses ProgressIndicator)**
   Widget _buildGraph(String label, double percentage, Color color) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,7 +163,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // **Transaction Item Widget**
   Widget _buildTransactionItem(Transaction transaction) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
