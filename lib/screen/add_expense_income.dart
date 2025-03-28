@@ -150,7 +150,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           ),
           SizedBox(height: 30),
           // Number Pad
-          Expanded(
+          Flexible(
             child: GridView.count(
               crossAxisCount: 3,
               crossAxisSpacing: 2,
