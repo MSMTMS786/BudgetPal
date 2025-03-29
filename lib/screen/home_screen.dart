@@ -17,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   double totalExpenses = 0.0;
   double totalIncome = 0.0;
   List<Transaction> transactions = [];
+  bool _isLoading = true;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -26,18 +27,28 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadTransactions();
   }
 
-  void _loadTransactions() async {
-    List<Transaction> loadedTransactions = await SharedPrefsHelper.loadTransactions();
+  Future<void> _loadTransactions() async {
     setState(() {
-      transactions = loadedTransactions;
-      balance = transactions.fold(0.0, (sum, item) => sum + (item.isExpense ? -item.amount : item.amount));
-      totalExpenses = transactions.where((t) => t.isExpense).fold(0.0, (sum, t) => sum + t.amount);
-      totalIncome = transactions.where((t) => !t.isExpense).fold(0.0, (sum, t) => sum + t.amount);
+      _isLoading = true;
     });
+    
+    List<Transaction> loadedTransactions = await SharedPrefsHelper.loadTransactions();
+    
+    if (mounted) {
+      setState(() {
+        transactions = loadedTransactions;
+        _calculateBalances();
+        _isLoading = false;
+      });
+    }
   }
 
-  void updateBalance(Transaction transaction) {
-    setState(() {
+  void _calculateBalances() {
+    balance = 0.0;
+    totalExpenses = 0.0;
+    totalIncome = 0.0;
+    
+    for (var transaction in transactions) {
       if (transaction.isExpense) {
         totalExpenses += transaction.amount;
         balance -= transaction.amount;
@@ -45,13 +56,79 @@ class _HomeScreenState extends State<HomeScreen> {
         totalIncome += transaction.amount;
         balance += transaction.amount;
       }
+    }
+  }
+
+  void addTransaction(Transaction transaction) {
+    setState(() {
       transactions.add(transaction);
-      SharedPrefsHelper.saveTransactions(transactions); // Save transactions persistently
+      if (transaction.isExpense) {
+        totalExpenses += transaction.amount;
+        balance -= transaction.amount;
+      } else {
+        totalIncome += transaction.amount;
+        balance += transaction.amount;
+      }
+      SharedPrefsHelper.saveTransactions(transactions);
     });
   }
 
-  double get expensePercentage => balance == 0.0 ? 0.0 : (totalExpenses / (totalExpenses + totalIncome));
-  double get incomePercentage => balance == 0.0 ? 0.0 : (totalIncome / (totalExpenses + totalIncome));
+  Future<void> _deleteTransaction(int index) async {
+    final transaction = transactions[index];
+    setState(() {
+      transactions.removeAt(index);
+      if (transaction.isExpense) {
+        totalExpenses -= transaction.amount;
+        balance += transaction.amount;
+      } else {
+        totalIncome -= transaction.amount;
+        balance -= transaction.amount;
+      }
+      SharedPrefsHelper.saveTransactions(transactions);
+    });
+  }
+
+  Future<bool> _confirmDelete(BuildContext context, Transaction transaction) async {
+    bool confirm = false;
+    
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: Text('Are you sure you want to delete the ${transaction.isExpense ? "expense" : "income"} of RS ${transaction.amount.toStringAsFixed(2)} for ${transaction.category}?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                confirm = false;
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                confirm = true;
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+    
+    return confirm;
+  }
+
+  double get expensePercentage {
+    final total = totalExpenses + totalIncome;
+    return total <= 0 ? 0.0 : (totalExpenses / total);
+  }
+  
+  double get incomePercentage {
+    final total = totalExpenses + totalIncome;
+    return total <= 0 ? 0.0 : (totalIncome / total);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,69 +154,97 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              Center(
-                child: Column(
-                  children: [
-                    const Text('Available Balance', style: TextStyle(color: Color(0xFFFFD700), fontSize: 14)),
-                    const SizedBox(height: 8),
-                    Text("RS ${balance.toStringAsFixed(2)}",
-                        style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
-                  ],
+          child: _isLoading 
+            ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)))
+            : Column(
+              children: [
+                const SizedBox(height: 20),
+                Center(
+                  child: Column(
+                    children: [
+                      const Text('Available Balance', style: TextStyle(color: Color(0xFFFFD700), fontSize: 14)),
+                      const SizedBox(height: 8),
+                      Text("RS ${balance.toStringAsFixed(2)}",
+                          style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    _buildGraph("Expenses", expensePercentage, Colors.red),
-                    const SizedBox(height: 10),
-                    _buildGraph("Income", incomePercentage, Colors.green),
-                  ],
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      _buildGraph("Expenses", expensePercentage, Colors.red),
+                      const SizedBox(height: 10),
+                      _buildGraph("Income", incomePercentage, Colors.green),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('My Transactions', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)),
-                    FloatingActionButton(
-                      onPressed: () async {
-                        final result = await Navigator.push<Transaction>(
-                          context,
-                          MaterialPageRoute(builder: (context) => const AddTransactionScreen()),
-                        );
-                        if (result != null) {
-                          updateBalance(result);
-                        }
-                      },
-                      backgroundColor: Color(0xFFFFD700),
-                      child: const Icon(Icons.add,color: Colors.white),
-                    ),
-                  ],
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('My Transactions', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)),
+                      FloatingActionButton(
+                        onPressed: () async {
+                          final result = await Navigator.push<Transaction>(
+                            context,
+                            MaterialPageRoute(builder: (context) => const AddTransactionScreen()),
+                          );
+                          if (result != null) {
+                            addTransaction(result);
+                          }
+                        },
+                        backgroundColor: const Color(0xFFFFD700),
+                        child: const Icon(Icons.add, color: Colors.white),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: transactions.isEmpty
+                const SizedBox(height: 10),
+                Expanded(
+                  child: transactions.isEmpty
                     ? const Center(
                         child: Text('No transactions yet', style: TextStyle(color: Colors.white)),
                       )
                     : ListView.builder(
                         itemCount: transactions.length,
                         itemBuilder: (context, index) {
-                          final transaction = transactions[transactions.length - 1 - index];
-                          return _buildTransactionItem(transaction);
+                          final reversedIndex = transactions.length - 1 - index;
+                          final transaction = transactions[reversedIndex];
+                          return Dismissible(
+                            key: UniqueKey(),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20.0),
+                              color: Colors.red,
+                              child: const Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                            ),
+                            confirmDismiss: (direction) async {
+                              return await _confirmDelete(context, transaction);
+                            },
+                            onDismissed: (direction) {
+                              _deleteTransaction(reversedIndex);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('${transaction.category} transaction deleted'),
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                            child: _buildTransactionItem(transaction),
+                          );
                         },
                       ),
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
         ),
       ),
     );
