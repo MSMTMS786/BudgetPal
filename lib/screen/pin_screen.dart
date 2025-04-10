@@ -2,7 +2,7 @@ import 'package:expense_tracker/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class PinScreen extends StatefulWidget {
-  const PinScreen({Key? key}) : super(key: key);
+  const PinScreen({super.key});
 
   @override
   _PinScreenState createState() => _PinScreenState();
@@ -205,7 +205,7 @@ class _PinScreenState extends State<PinScreen> {
 // Update your existing HomeScreen to implement this
 // For example:
 class HomeScreenWithPin extends StatelessWidget {
-  const HomeScreenWithPin({Key? key}) : super(key: key);
+  const HomeScreenWithPin({super.key});
 
   @override
   Widget build(BuildContext context) {

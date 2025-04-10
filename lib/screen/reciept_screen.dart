@@ -1,18 +1,40 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:expense_tracker/model/model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:screenshot/screenshot.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:flutter/rendering.dart';
 
 class ReceiptScreen extends StatelessWidget {
   final Transaction transaction;
-  final ScreenshotController _screenshotController = ScreenshotController();
+  final GlobalKey _globalKey = GlobalKey();
 
-  ReceiptScreen({Key? key, required this.transaction}) : super(key: key);
+  ReceiptScreen({super.key, required this.transaction});
+
+  Future<void> _captureAndShareReceipt(BuildContext context) async {
+    try {
+      RenderRepaintBoundary boundary =
+          _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      var image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
+      Uint8List pngBytes = byteData!.buffer.asUint8List();
+
+      final directory = await getTemporaryDirectory();
+      final imagePath = File('${directory.path}/receipt.png');
+      await imagePath.writeAsBytes(pngBytes);
+
+      await Share.shareXFiles([XFile(imagePath.path)],
+          text: 'Here is your BudgetPal receipt!');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error capturing receipt: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,10 +60,11 @@ class ReceiptScreen extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: Screenshot(
-              controller: _screenshotController,
+            child: RepaintBoundary(
+              key: _globalKey,
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -115,110 +138,26 @@ class ReceiptScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Transaction Type:',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                Text(
-                                  transaction.isExpense ? 'EXPENSE' : 'INCOME',
-                                  style: TextStyle(
-                                    color: transactionColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            _infoRow('Transaction Type:',
+                                transaction.isExpense ? 'EXPENSE' : 'INCOME',
+                                valueColor: transactionColor,
+                                isBold: true),
                             const Divider(height: 24),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Amount:',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                Text(
-                                  'RS. ${transaction.amount.toStringAsFixed(2)}',
-                                  style: TextStyle(
-                                    color: transactionColor,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            _infoRow('Amount:',
+                                'RS. ${transaction.amount.toStringAsFixed(2)}',
+                                valueColor: transactionColor,
+                                isBold: true,
+                                valueSize: 20),
                             const Divider(height: 24),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Category:',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                Text(
-                                  transaction.category,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            _infoRow('Category:', transaction.category,
+                                isBold: true),
                             const Divider(height: 24),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Payment Method:',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                Text(
-                                  transaction.paymentMethod,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            _infoRow('Payment Method:', transaction.paymentMethod,
+                                isBold: true),
                             const Divider(height: 24),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Transaction ID:',
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                Text(
-                                  transaction.id.substring(0, 8),
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontFamily: 'monospace',
-                                  ),
-                                ),
-                              ],
-                            ),
+                            _infoRow('Transaction ID:',
+                                transaction.id.substring(0, 8),
+                                fontFamily: 'monospace'),
                             const Divider(height: 24),
                             const Text(
                               'Description:',
@@ -260,21 +199,7 @@ class ReceiptScreen extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () async {
-                final Uint8List? imageBytes = await _screenshotController.capture();
-
-                if (imageBytes != null) {
-                  final directory = await getTemporaryDirectory();
-                  final imagePath = File('${directory.path}/receipt.png');
-                  await imagePath.writeAsBytes(imageBytes);
-
-                  await Share.shareXFiles([XFile(imagePath.path)], text: 'Here is your BudgetPal receipt!');
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Failed to capture receipt')),
-                  );
-                }
-              },
+              onPressed: () => _captureAndShareReceipt(context),
               icon: const Icon(Icons.share),
               label: const Text('Share Receipt'),
               style: ElevatedButton.styleFrom(
@@ -291,6 +216,29 @@ class ReceiptScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _infoRow(String title, String value,
+      {Color? valueColor,
+      bool isBold = false,
+      double valueSize = 16,
+      String? fontFamily}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(color: Colors.black54, fontSize: 16),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: valueColor ?? Colors.black,
+            fontSize: valueSize,
+            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            fontFamily: fontFamily,
+          ),
+        ),
+      ],
+    );
+  }
 }
-// This code defines a ReceiptScreen widget that displays the details of a transaction in a receipt format.
-// It uses the Screenshot package to capture the receipt as an image and allows the user to share it via the SharePlus package.

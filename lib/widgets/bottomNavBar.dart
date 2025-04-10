@@ -4,7 +4,7 @@ import '../screen/pin_screen.dart';
 import '../screen/add_expense_income.dart';
 
 class BottomNavBar extends StatefulWidget {
-  const BottomNavBar({Key? key}) : super(key: key);
+  const BottomNavBar({super.key});
 
   @override
   _BottomNavBarState createState() => _BottomNavBarState();

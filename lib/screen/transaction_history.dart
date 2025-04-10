@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 class TransactionsListScreen extends StatelessWidget {
   final List<Transaction> transactions;
 
-  const TransactionsListScreen({Key? key, required this.transactions}) : super(key: key);
+  const TransactionsListScreen({super.key, required this.transactions});
 
   @override
   Widget build(BuildContext context) {
@@ -57,10 +57,10 @@ class TransactionCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const TransactionCard({
-    Key? key,
+    super.key,
     required this.transaction,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

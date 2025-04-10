@@ -7,7 +7,7 @@ import 'package:expense_tracker/model/model.dart';
 class MyDrawer extends StatefulWidget {
   final List<Transaction> transactions;
   
-  const MyDrawer({Key? key, required this.transactions}) : super(key: key);
+  const MyDrawer({super.key, required this.transactions});
   
   @override
   State<MyDrawer> createState() => _MyDrawerState();

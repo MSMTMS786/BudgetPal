@@ -53,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   // Dollar bill part
                   Positioned(
                     left: 0,
-                    child: Container(
+                    child: SizedBox(
                       height: 80,
                       width: 80,
                       child: CustomPaint(painter: DollarBillPainter()),
