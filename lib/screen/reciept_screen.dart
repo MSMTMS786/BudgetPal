@@ -9,16 +9,44 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter/rendering.dart';
 
-class ReceiptScreen extends StatelessWidget {
+class ReceiptScreen extends StatefulWidget {
   final Transaction transaction;
+
+  const ReceiptScreen({Key? key, required this.transaction}) : super(key: key);
+
+  @override
+  State<ReceiptScreen> createState() => _ReceiptScreenState();
+}
+
+class _ReceiptScreenState extends State<ReceiptScreen> with WidgetsBindingObserver {
   final GlobalKey _globalKey = GlobalKey();
 
-  ReceiptScreen({super.key, required this.transaction});
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setState(() {
+        // Force rebuild on resume
+      });
+    }
+  }
 
   Future<void> _captureAndShareReceipt(BuildContext context) async {
     try {
       RenderRepaintBoundary boundary =
-          _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+          _globalKey.currentContext!.findRenderObject()
+              as RenderRepaintBoundary;
       var image = await boundary.toImage(pixelRatio: 3.0);
       ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
       Uint8List pngBytes = byteData!.buffer.asUint8List();
@@ -27,17 +55,19 @@ class ReceiptScreen extends StatelessWidget {
       final imagePath = File('${directory.path}/receipt.png');
       await imagePath.writeAsBytes(pngBytes);
 
-      await Share.shareXFiles([XFile(imagePath.path)],
-          text: 'Here is your BudgetPal receipt!');
+      await Share.shareXFiles([
+        XFile(imagePath.path),
+      ], text: 'Here is your BudgetPal receipt!');
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error capturing receipt: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error capturing receipt: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final transaction = widget.transaction;
     final formatter = DateFormat('MMM dd, yyyy HH:mm');
     final formattedDate = formatter.format(transaction.date);
     final transactionColor = transaction.isExpense ? Colors.red : Colors.green;
@@ -63,8 +93,10 @@ class ReceiptScreen extends StatelessWidget {
             child: RepaintBoundary(
               key: _globalKey,
               child: Container(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -138,26 +170,38 @@ class ReceiptScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _infoRow('Transaction Type:',
-                                transaction.isExpense ? 'EXPENSE' : 'INCOME',
-                                valueColor: transactionColor,
-                                isBold: true),
+                            _infoRow(
+                              'Transaction Type:',
+                              transaction.isExpense ? 'EXPENSE' : 'INCOME',
+                              valueColor: transactionColor,
+                              isBold: true,
+                            ),
                             const Divider(height: 24),
-                            _infoRow('Amount:',
-                                'RS. ${transaction.amount.toStringAsFixed(2)}',
-                                valueColor: transactionColor,
-                                isBold: true,
-                                valueSize: 20),
+                            _infoRow(
+                              'Amount:',
+                              'RS. ${transaction.amount.toStringAsFixed(2)}',
+                              valueColor: transactionColor,
+                              isBold: true,
+                              valueSize: 20,
+                            ),
                             const Divider(height: 24),
-                            _infoRow('Category:', transaction.category,
-                                isBold: true),
+                            _infoRow(
+                              'Category:',
+                              transaction.category,
+                              isBold: true,
+                            ),
                             const Divider(height: 24),
-                            _infoRow('Payment Method:', transaction.paymentMethod,
-                                isBold: true),
+                            _infoRow(
+                              'Payment Method:',
+                              transaction.paymentMethod,
+                              isBold: true,
+                            ),
                             const Divider(height: 24),
-                            _infoRow('Transaction ID:',
-                                transaction.id.substring(0, 8),
-                                fontFamily: 'monospace'),
+                            _infoRow(
+                              'Transaction ID:',
+                              transaction.id.substring(0, 8),
+                              fontFamily: 'monospace',
+                            ),
                             const Divider(height: 24),
                             const Text(
                               'Description:',
@@ -200,8 +244,11 @@ class ReceiptScreen extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () => _captureAndShareReceipt(context),
-              icon: const Icon(Icons.share),
-              label: const Text('Share Receipt'),
+              icon: const Icon(Icons.share, color: Colors.white),
+              label: const Text(
+                'Share Receipt',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.indigo,
                 foregroundColor: Colors.white,
@@ -217,11 +264,14 @@ class ReceiptScreen extends StatelessWidget {
     );
   }
 
-  Widget _infoRow(String title, String value,
-      {Color? valueColor,
-      bool isBold = false,
-      double valueSize = 16,
-      String? fontFamily}) {
+  Widget _infoRow(
+    String title,
+    String value, {
+    Color? valueColor,
+    bool isBold = false,
+    double valueSize = 16,
+    String? fontFamily,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
