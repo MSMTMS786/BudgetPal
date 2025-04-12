@@ -9,38 +9,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter/rendering.dart';
 
-class ReceiptScreen extends StatefulWidget {
+class ReceiptScreen extends StatelessWidget {
   final Transaction transaction;
-
-  const ReceiptScreen({Key? key, required this.transaction}) : super(key: key);
-
-  @override
-  State<ReceiptScreen> createState() => _ReceiptScreenState();
-}
-
-class _ReceiptScreenState extends State<ReceiptScreen> with WidgetsBindingObserver {
   final GlobalKey _globalKey = GlobalKey();
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      setState(() {
-        // Force rebuild on resume
-      });
-    }
-  }
+  ReceiptScreen({super.key, required this.transaction});
 
   Future<void> _captureAndShareReceipt(BuildContext context) async {
     try {
@@ -67,7 +40,6 @@ class _ReceiptScreenState extends State<ReceiptScreen> with WidgetsBindingObserv
 
   @override
   Widget build(BuildContext context) {
-    final transaction = widget.transaction;
     final formatter = DateFormat('MMM dd, yyyy HH:mm');
     final formattedDate = formatter.format(transaction.date);
     final transactionColor = transaction.isExpense ? Colors.red : Colors.green;
@@ -244,7 +216,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> with WidgetsBindingObserv
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () => _captureAndShareReceipt(context),
-              icon: const Icon(Icons.share, color: Colors.white),
+              icon: const Icon(Icons.share,color: Colors.white,),
               label: const Text(
                 'Share Receipt',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
