@@ -85,7 +85,7 @@ class ReceiptScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF252836),
+                        color: Color(0xffffffff),
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(12),
                           topRight: Radius.circular(12),
@@ -94,19 +94,27 @@ class ReceiptScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           const Text(
-                            'RECEIPT',
+                            'Transaction Successful',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            formattedDate,
+                            "TID: ${transaction.id}",
                             style: const TextStyle(
-                              color: Colors.white70,
+                              color: Colors.black,
                               fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "On $formattedDate",
+                            style: const TextStyle(
+                              color: Colors.black54,
+                              fontSize: 16,
                             ),
                           ),
                         ],
@@ -142,70 +150,89 @@ class ReceiptScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Center(
+                              child: Text(
+                                "Rs. ${transaction.amount.toStringAsFixed(2)}",
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Center(
+                              child: Text(
+                                transaction.isExpense ? 'Expense' : 'Income',
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const Divider(height: 24),
                             _infoRow(
-                              'Transaction Type:',
-                              transaction.isExpense ? 'EXPENSE' : 'INCOME',
-                              valueColor: transactionColor,
+                              'Fee',
+                              "0.00",
+                              valueColor: Colors.black,
                               isBold: true,
                             ),
                             const Divider(height: 24),
                             _infoRow(
-                              'Amount:',
-                              'RS. ${transaction.amount.toStringAsFixed(2)}',
-                              valueColor: transactionColor,
-                              isBold: true,
-                              valueSize: 20,
-                            ),
-                            const Divider(height: 24),
-                            _infoRow(
-                              'Category:',
+                              'Category',
                               transaction.category,
                               isBold: true,
                             ),
                             const Divider(height: 24),
                             _infoRow(
-                              'Payment Method:',
+                              'Payment Method',
                               transaction.paymentMethod,
                               isBold: true,
                             ),
                             const Divider(height: 24),
-                            _infoRow(
-                              'Transaction ID:',
-                              transaction.id.substring(0, 8),
-                              fontFamily: 'monospace',
-                            ),
-                            const Divider(height: 24),
-                            const Text(
-                              'Description:',
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              transaction.description,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Description ",
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    transaction.description,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Thank you for using BudgetPal!',
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 12,
-                          fontStyle: FontStyle.italic,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Thank you for using BudgetPal!',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                          ),
                         ),
-                      ),
+                        
+                      ],
+                      
                     ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -216,7 +243,7 @@ class ReceiptScreen extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () => _captureAndShareReceipt(context),
-              icon: const Icon(Icons.share,color: Colors.white,),
+              icon: const Icon(Icons.share, color: Colors.white),
               label: const Text(
                 'Share Receipt',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

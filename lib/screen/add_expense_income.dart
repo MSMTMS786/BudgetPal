@@ -116,6 +116,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   DropdownMenuItem(value: "Transport", child: Text("Transport")),
                   DropdownMenuItem(value: "Shopping", child: Text("Shopping")),
                   DropdownMenuItem(value: "Entertainment", child: Text("Entertainment")),
+                  DropdownMenuItem(value: "Other", child: Text("Other")),
                 ],
               ),
             SizedBox(height: 60),
