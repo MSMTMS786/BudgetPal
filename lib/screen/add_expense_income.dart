@@ -101,25 +101,51 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               ),
             ),
             
-            // Category Selection (Only for Expense)
-            if (!isIncome)
-              DropdownButton<String>(
-                dropdownColor: const Color(0xFF1F1D2B),
-                underline: Container(),
-                icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white70),
-                style: const TextStyle(color: Colors.white),
-                hint: const Text("Category", style: TextStyle(color: Colors.white70)),
-                value: selectedCategory,
-                onChanged: (value) => setState(() => selectedCategory = value),
-                items: const [
-                  DropdownMenuItem(value: "Food", child: Text("Food")),
-                  DropdownMenuItem(value: "Transport", child: Text("Transport")),
-                  DropdownMenuItem(value: "Shopping", child: Text("Shopping")),
-                  DropdownMenuItem(value: "Entertainment", child: Text("Entertainment")),
-                  DropdownMenuItem(value: "Other", child: Text("Other")),
+            Padding(
+              padding: const EdgeInsets.only(left: 20,right: 20,top: 20),
+              child: Row(
+               
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Category Selection (Only for Icome)
+                         
+                DropdownButton<String>(
+                  dropdownColor: const Color(0xFF1F1D2B),
+                  underline: Container(),
+                  icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white70),
+                  style: const TextStyle(color: Colors.white),
+                  hint: const Text("Payment Method", style: TextStyle(color: Colors.white70)),
+                  value: selectedPaymentMethod,
+                  onChanged: (value) => setState(() => selectedPaymentMethod = value),
+                  items: const [
+                    DropdownMenuItem(value: "Cash", child: Text("Cash")),
+                    DropdownMenuItem(value: "Card", child: Text("Card")),
+                    DropdownMenuItem(value: "Net Banking", child: Text("Net Banking")),
+                    DropdownMenuItem(value: "Other", child: Text("Other")),
+                  ],
+                ),
+              // Category Selection (Only for Expense)
+              if (!isIncome)
+                DropdownButton<String>(
+                  dropdownColor: const Color(0xFF1F1D2B),
+                  underline: Container(),
+                  icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white70),
+                  style: const TextStyle(color: Colors.white),
+                  hint: const Text("Category", style: TextStyle(color: Colors.white70)),
+                  value: selectedCategory,
+                  onChanged: (value) => setState(() => selectedCategory = value),
+                  items: const [
+                    DropdownMenuItem(value: "Food", child: Text("Food")),
+                    DropdownMenuItem(value: "Transport", child: Text("Transport")),
+                    DropdownMenuItem(value: "Shopping", child: Text("Shopping")),
+                    DropdownMenuItem(value: "Entertainment", child: Text("Entertainment")),
+                    DropdownMenuItem(value: "Other", child: Text("Other")),
+                  ],
+                ),
                 ],
               ),
-            SizedBox(height: 60),
+            ),
+           
             // Amount Display
             Text("RS. $amount", style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold)),
             

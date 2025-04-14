@@ -42,7 +42,6 @@ class ReceiptScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final formatter = DateFormat('MMM dd, yyyy HH:mm');
     final formattedDate = formatter.format(transaction.date);
-    final transactionColor = transaction.isExpense ? Colors.red : Colors.green;
 
     return Scaffold(
       backgroundColor: const Color(0xFF1F1D2B),
