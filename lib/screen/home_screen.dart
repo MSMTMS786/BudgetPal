@@ -279,9 +279,15 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: transaction.isExpense ? Colors.orange.withOpacity(0.1) : Colors.green.withOpacity(0.1),
-          child: Icon(transaction.isExpense ? Icons.remove : Icons.add, color: transaction.isExpense ? Colors.orange : Colors.green),
-        ),
+  backgroundColor: _getCategoryColor(transaction.category),
+  child: Text(
+    transaction.category.isNotEmpty ? transaction.category[0].toUpperCase() : '?',
+    style: TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+),
         title: Text(transaction.category),
         subtitle: Text("${transaction.description} • ${DateFormat.yMMMd().format(transaction.date)}"),
         trailing: Text(
@@ -291,4 +297,22 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+Color _getCategoryColor(String category) {
+  // Map categories to colors
+  final colorMap = {
+    'Food': Colors.orange,
+    'Transport': Colors.blue,
+    'Shopping': Colors.purple,
+    'Cash': Colors.lightGreen,
+    'Entertainment': Colors.pink,
+    'Card': Colors.teal,
+    'Online Transfer': Colors.indigo,
+    'Income': Colors.green,
+    'Expense': Colors.red,
+    // Add more categories as needed
+  };
+
+  // Return the color for the category, or a default color if not found
+  return colorMap[category]?.withOpacity(0.9) ?? Colors.grey.withOpacity(0.5);
 }

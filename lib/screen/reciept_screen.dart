@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
-
 import 'package:expense_tracker/model/model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -227,9 +226,13 @@ class ReceiptScreen extends StatelessWidget {
                             fontStyle: FontStyle.italic,
                           ),
                         ),
-                        
-                      ],
-                      
+                        const SizedBox(width: 8),
+                       Icon(
+                          Icons.check_circle,
+                          color: Colors.green,
+                          size: 26,
+                        ),
+                      ],  
                     ),
                     const SizedBox(height: 16),
                   ],

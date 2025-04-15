@@ -120,8 +120,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   items: const [
                     DropdownMenuItem(value: "Cash", child: Text("Cash")),
                     DropdownMenuItem(value: "Card", child: Text("Card")),
-                    DropdownMenuItem(value: "Net Banking", child: Text("Net Banking")),
-                    DropdownMenuItem(value: "Other", child: Text("Other")),
+                    DropdownMenuItem(value: "Transfer", child: Text("Online Transfer")),
+                  
                   ],
                 ),
               // Category Selection (Only for Expense)
