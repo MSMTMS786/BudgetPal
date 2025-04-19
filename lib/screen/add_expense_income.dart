@@ -79,7 +79,13 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         alignment: Alignment.center,
-                        child: const Text("INCOME", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          "INCOME",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -93,67 +99,107 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         alignment: Alignment.center,
-                        child: const Text("EXPENSE", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          "EXPENSE",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             Padding(
-              padding: const EdgeInsets.only(left: 20,right: 20,top: 20),
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
               child: Row(
-               
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Category Selection (Only for Icome)
-                         
-                DropdownButton<String>(
-                  dropdownColor: const Color(0xFF1F1D2B),
-                  underline: Container(),
-                  icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white70),
-                  style: const TextStyle(color: Colors.white),
-                  hint: const Text("Payment Method", style: TextStyle(color: Colors.white70)),
-                  value: selectedPaymentMethod,
-                  onChanged: (value) => setState(() => selectedPaymentMethod = value),
-                  items: const [
-                    DropdownMenuItem(value: "Cash", child: Text("Cash")),
-                    DropdownMenuItem(value: "Card", child: Text("Card")),
-                    DropdownMenuItem(value: "Transfer", child: Text("Online Transfer")),
-                  
-                  ],
-                ),
-              // Category Selection (Only for Expense)
-              if (!isIncome)
-                DropdownButton<String>(
-                  dropdownColor: const Color(0xFF1F1D2B),
-                  underline: Container(),
-                  icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white70),
-                  style: const TextStyle(color: Colors.white),
-                  hint: const Text("Category", style: TextStyle(color: Colors.white70)),
-                  value: selectedCategory,
-                  onChanged: (value) => setState(() => selectedCategory = value),
-                  items: const [
-                    DropdownMenuItem(value: "Food", child: Text("Food")),
-                    DropdownMenuItem(value: "Transport", child: Text("Transport")),
-                    DropdownMenuItem(value: "Shopping", child: Text("Shopping")),
-                    DropdownMenuItem(value: "Entertainment", child: Text("Entertainment")),
-                    DropdownMenuItem(value: "Other", child: Text("Other")),
-                  ],
-                ),
+                  DropdownButton<String>(
+                    dropdownColor: const Color(0xFF1F1D2B),
+                    underline: Container(),
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.white70,
+                    ),
+                    style: const TextStyle(color: Colors.white),
+                    hint: const Text(
+                      "Payment Method",
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                    value: selectedPaymentMethod,
+                    onChanged:
+                        (value) =>
+                            setState(() => selectedPaymentMethod = value),
+                    items: const [
+                      DropdownMenuItem(value: "Cash", child: Text("Cash")),
+                      DropdownMenuItem(value: "Card", child: Text("Card")),
+                      DropdownMenuItem(
+                        value: "Transfer",
+                        child: Text("Online Transfer"),
+                      ),
+                    ],
+                  ),
+                  // Category Selection (Only for Expense)
+                  if (!isIncome)
+                    DropdownButton<String>(
+                      dropdownColor: const Color(0xFF1F1D2B),
+                      underline: Container(),
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Colors.white70,
+                      ),
+                      style: const TextStyle(color: Colors.white),
+                      hint: const Text(
+                        "Category",
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      value: selectedCategory,
+                      onChanged:
+                          (value) => setState(() => selectedCategory = value),
+                      items: const [
+                        DropdownMenuItem(value: "Food", child: Text("Food")),
+                        DropdownMenuItem(
+                          value: "Transport",
+                          child: Text("Transport"),
+                        ),
+                        DropdownMenuItem(
+                          value: "Shopping",
+                          child: Text("Shopping"),
+                        ),
+                        DropdownMenuItem(
+                          value: "Entertainment",
+                          child: Text("Entertainment"),
+                        ),
+                        DropdownMenuItem(value: "Other", child: Text("Other")),
+                      ],
+                    ),
                 ],
               ),
             ),
-           
+
             // Amount Display
-            Text("RS. $amount", style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold)),
-            
+            Text(
+              "RS. $amount",
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
             // Description Input
             Padding(
               padding: const EdgeInsets.all(15),
               child: TextField(
-                decoration: const InputDecoration(hintText: "Add Description", hintStyle: TextStyle(color: Colors.grey)),
+                decoration: const InputDecoration(
+                  hintText: "Add Description",
+                  hintStyle: TextStyle(color: Colors.grey),
+                ),
                 style: const TextStyle(color: Colors.white),
                 onChanged: (value) => setState(() => description = value),
               ),
@@ -163,17 +209,31 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             Container(
               height: MediaQuery.of(context).size.height * 0.06,
               width: MediaQuery.of(context).size.width * 0.5,
-              decoration: BoxDecoration(
-                color: Color(0xFF1F1D2B),
-              ),
+              decoration: BoxDecoration(color: Color(0xFF1F1D2B)),
               child: ElevatedButton(
-            
                 style: ElevatedButton.styleFrom(
-                 backgroundColor: Color(0xFF1F1D2B),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  backgroundColor: const Color(0xFF1F1D2B),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-                onPressed: _addTransaction,
-                child: const Text("Tap to ADD", style: TextStyle(color: Colors.white, fontSize: 16)),
+                onPressed: () {
+                  if (amount != "0" && description.isNotEmpty) {
+                    _addTransaction();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          "Please enter a valid amount and description.",
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: const Text(
+                  "Tap to ADD",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
               ),
             ),
             SizedBox(height: 30),
@@ -185,7 +245,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 mainAxisSpacing: 10,
                 childAspectRatio: 2,
                 children: [
-                  ...List.generate(9, (i) => _buildNumberButton((i + 1).toString())),
+                  ...List.generate(
+                    9,
+                    (i) => _buildNumberButton((i + 1).toString()),
+                  ),
                   _buildNumberButton("."),
                   _buildNumberButton("0"),
                   _buildDeleteButton(),
@@ -203,8 +266,18 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       onTap: () => updateAmount(digit),
       child: Container(
         alignment: Alignment.center,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(0.3)),
-        child: Text(digit, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white.withOpacity(0.3),
+        ),
+        child: Text(
+          digit,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }
@@ -214,8 +287,15 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       onTap: _deleteDigit,
       child: Container(
         alignment: Alignment.center,
-        decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.red),
-        child: const Icon(Icons.backspace_outlined, color: Colors.white, size: 28),
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.red,
+        ),
+        child: const Icon(
+          Icons.backspace_outlined,
+          color: Colors.white,
+          size: 28,
+        ),
       ),
     );
   }

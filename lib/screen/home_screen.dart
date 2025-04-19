@@ -268,51 +268,67 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTransactionItem(Transaction transaction) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
-      ),
-      child: ListTile(
-        leading: CircleAvatar(
-  backgroundColor: _getCategoryColor(transaction.category),
-  child: Text(
-    transaction.category.isNotEmpty ? transaction.category[0].toUpperCase() : '?',
-    style: TextStyle(
+ Widget _buildTransactionItem(Transaction transaction) {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
       color: Colors.white,
-      fontWeight: FontWeight.bold,
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(color: Colors.grey.withOpacity(0.2)),
     ),
-  ),
-),
-        title: Text(transaction.category),
-        subtitle: Text("${transaction.description} • ${DateFormat.yMMMd().format(transaction.date)}"),
-        trailing: Text(
-          '${transaction.isExpense ? '-' : '+'} RS.${transaction.amount.toStringAsFixed(2)}',
-          style: TextStyle(color: transaction.isExpense ? Colors.red : Colors.green, fontWeight: FontWeight.bold),
+    child: ListTile(
+      leading: CircleAvatar(
+        backgroundColor: _getCategoryColor(transaction.category),
+        child: Text(
+          _getCategoryInitial(transaction.category),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
-    );
-  }
+      title: Text(transaction.category),
+      subtitle: Text("${transaction.description} • ${DateFormat.yMMMd().format(transaction.date)}"),
+      trailing: Text(
+        '${transaction.isExpense ? '-' : '+'} RS.${transaction.amount.toStringAsFixed(2)}',
+        style: TextStyle(color: transaction.isExpense ? Colors.red : Colors.green, fontWeight: FontWeight.bold),
+      ),
+    ),
+  );
 }
-Color _getCategoryColor(String category) {
-  // Map categories to colors
-  final colorMap = {
-    'Food': Colors.orange,
-    'Transport': Colors.blue,
-    'Shopping': Colors.purple,
-    'Cash': Colors.lightGreen,
-    'Entertainment': Colors.pink,
-    'Card': Colors.teal,
-    'Online Transfer': Colors.indigo,
-    'Income': Colors.green,
-    'Expense': Colors.red,
-    // Add more categories as needed
-  };
 
-  // Return the color for the category, or a default color if not found
-  return colorMap[category]?.withOpacity(0.9) ?? Colors.grey.withOpacity(0.5);
+String _getCategoryInitial(String category) {
+  if (category.isEmpty) {
+    return "?";
+  }
+  return category[0].toUpperCase();
+}
+
+Color _getCategoryColor(String category) {
+  if (category.isEmpty) {
+    return Colors.grey.withOpacity(0.2);
+  }
+  
+  // Using the first character of the category to generate a consistent color
+  final int hashCode = category.toLowerCase().hashCode;
+  
+  // List of distinct colors
+  final colors = [
+    Colors.blue,
+    Colors.red,
+    Colors.green,
+    Colors.orange,
+    Colors.purple,
+    Colors.teal,
+    Colors.pink,
+    Colors.indigo,
+    Colors.amber,
+    Colors.cyan,
+    Colors.deepOrange,
+    Colors.lightBlue,
+  ];
+  
+  return colors[hashCode.abs() % colors.length];
+}
 }
