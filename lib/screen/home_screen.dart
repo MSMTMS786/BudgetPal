@@ -1,7 +1,9 @@
+// Keep your imports as is
 import 'package:expense_tracker/model/model.dart';
 import 'package:expense_tracker/screen/add_expense_income.dart';
 import 'package:expense_tracker/widgets/Drawer.dart';
 import 'package:expense_tracker/model/shared_pref_helper.dart';
+import 'package:expense_tracker/widgets/bottomNavBar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -31,9 +33,9 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _isLoading = true;
     });
-    
+
     List<Transaction> loadedTransactions = await SharedPrefsHelper.loadTransactions();
-    
+
     if (mounted) {
       setState(() {
         transactions = loadedTransactions;
@@ -47,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
     balance = 0.0;
     totalExpenses = 0.0;
     totalIncome = 0.0;
-    
+
     for (var transaction in transactions) {
       if (transaction.isExpense) {
         totalExpenses += transaction.amount;
@@ -62,35 +64,22 @@ class _HomeScreenState extends State<HomeScreen> {
   void addTransaction(Transaction transaction) {
     setState(() {
       transactions.add(transaction);
-      if (transaction.isExpense) {
-        totalExpenses += transaction.amount;
-        balance -= transaction.amount;
-      } else {
-        totalIncome += transaction.amount;
-        balance += transaction.amount;
-      }
+      _calculateBalances();
       SharedPrefsHelper.saveTransactions(transactions);
     });
   }
 
   Future<void> _deleteTransaction(int index) async {
-    final transaction = transactions[index];
     setState(() {
       transactions.removeAt(index);
-      if (transaction.isExpense) {
-        totalExpenses -= transaction.amount;
-        balance += transaction.amount;
-      } else {
-        totalIncome -= transaction.amount;
-        balance -= transaction.amount;
-      }
+      _calculateBalances();
       SharedPrefsHelper.saveTransactions(transactions);
     });
   }
 
   Future<bool> _confirmDelete(BuildContext context, Transaction transaction) async {
     bool confirm = false;
-    
+
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -116,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
     );
-    
+
     return confirm;
   }
 
@@ -124,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final total = totalExpenses + totalIncome;
     return total <= 0 ? 0.0 : (totalExpenses / total);
   }
-  
+
   double get incomePercentage {
     final total = totalExpenses + totalIncome;
     return total <= 0 ? 0.0 : (totalIncome / total);
@@ -154,97 +143,122 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         child: SafeArea(
-          child: _isLoading 
-            ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)))
-            : Column(
-              children: [
-                const SizedBox(height: 20),
-                Center(
-                  child: Column(
-                    children: [
-                      const Text('Available Balance', style: TextStyle(color: Color(0xFFFFD700), fontSize: 14)),
-                      const SizedBox(height: 8),
-                      Text("RS ${balance.toStringAsFixed(2)}",
-                          style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
-                      _buildGraph("Expenses", expensePercentage, Colors.red),
-                      const SizedBox(height: 10),
-                      _buildGraph("Income", incomePercentage, Colors.green),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('My Transactions', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)),
-                      FloatingActionButton(
-                        onPressed: () async {
-                          final result = await Navigator.push<Transaction>(
-                            context,
-                            MaterialPageRoute(builder: (context) => const AddTransactionScreen()),
-                          );
-                          if (result != null) {
-                            addTransaction(result);
-                          }
-                        },
-                        backgroundColor: const Color(0xFFFFD700),
-                        child: const Icon(Icons.add, color: Colors.white),
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)))
+              : Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    Center(
+                      child: Column(
+                        children: [
+                          const Text('Available Balance', style: TextStyle(color: Color(0xFFFFD700), fontSize: 14)),
+                          const SizedBox(height: 8),
+                          Text("RS ${balance.toStringAsFixed(2)}",
+                              style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: transactions.isEmpty
-                    ? const Center(
-                        child: Text('No transactions yet', style: TextStyle(color: Colors.white)),
-                      )
-                    : ListView.builder(
-                        itemCount: transactions.length,
-                        itemBuilder: (context, index) {
-                          final reversedIndex = transactions.length - 1 - index;
-                          final transaction = transactions[reversedIndex];
-                          return Dismissible(
-                            key: UniqueKey(),
-                            direction: DismissDirection.endToStart,
-                            background: Container(
-                              alignment: Alignment.centerRight,
-                              padding: const EdgeInsets.only(right: 20.0),
-                              color: Colors.red,
-                              child: const Icon(
-                                Icons.delete,
-                                color: Colors.white,
-                              ),
-                            ),
-                            confirmDismiss: (direction) async {
-                              return await _confirmDelete(context, transaction);
-                            },
-                            onDismissed: (direction) {
-                              _deleteTransaction(reversedIndex);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('${transaction.category} transaction deleted'),
-                                  duration: const Duration(seconds: 2),
-                                ),
+                    ),
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        children: [
+                          _buildGraph("Expenses", expensePercentage, Colors.red),
+                          const SizedBox(height: 10),
+                          _buildGraph("Income", incomePercentage, Colors.green),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('My Transactions', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)),
+                          FloatingActionButton(
+                            onPressed: () async {
+                              final result = await Navigator.push<Transaction>(
+                                context,
+                                MaterialPageRoute(builder: (context) => const AddTransactionScreen()),
                               );
+                              if (result != null) {
+                                addTransaction(result);
+                              }
                             },
-                            child: _buildTransactionItem(transaction),
-                          );
-                        },
+                            backgroundColor: const Color(0xFFFFD700),
+                            child: const Icon(Icons.add, color: Colors.white),
+                          ),
+                        ],
                       ),
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: transactions.isEmpty
+                          ? const Center(
+                              child: Text('No transactions yet', style: TextStyle(color: Colors.white)),
+                            )
+                          : ListView.builder(
+                              itemCount: transactions.length,
+                              itemBuilder: (context, index) {
+                                final reversedIndex = transactions.length - 1 - index;
+                                final transaction = transactions[reversedIndex];
+
+                                return Dismissible(
+                                  key: UniqueKey(),
+                                  background: Container(
+                                    alignment: Alignment.centerLeft,
+                                    padding: const EdgeInsets.only(left: 20.0),
+                                    color: Colors.blue,
+                                    child: const Icon(Icons.edit, color: Colors.white),
+                                  ),
+                                  secondaryBackground: Container(
+                                    alignment: Alignment.centerRight,
+                                    padding: const EdgeInsets.only(right: 20.0),
+                                    color: Colors.red,
+                                    child: const Icon(Icons.delete, color: Colors.white),
+                                  ),
+                                  confirmDismiss: (direction) async {
+                                    if (direction == DismissDirection.startToEnd) {
+                                      final editedTransaction = await Navigator.push<Transaction>(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AddTransactionScreen(transaction: transaction),
+                                        ),
+                                      );
+
+                                      if (editedTransaction != null) {
+                                        setState(() {
+                                          transactions[reversedIndex] = editedTransaction;
+                                          SharedPrefsHelper.saveTransactions(transactions);
+                                          _calculateBalances();
+                                        });
+                                      }
+
+                                      return false; // Don't dismiss the tile
+                                    } else if (direction == DismissDirection.endToStart) {
+                                      return await _confirmDelete(context, transaction);
+                                    }
+                                    return false;
+                                  },
+                                  onDismissed: (direction) {
+                                    if (direction == DismissDirection.endToStart) {
+                                      _deleteTransaction(reversedIndex);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('${transaction.category} transaction deleted'),
+                                          duration: const Duration(seconds: 2),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: _buildTransactionItem(transaction),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
         ),
       ),
     );
@@ -268,67 +282,46 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
- Widget _buildTransactionItem(Transaction transaction) {
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-    padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(8),
-      border: Border.all(color: Colors.grey.withOpacity(0.2)),
-    ),
-    child: ListTile(
-      leading: CircleAvatar(
-        backgroundColor: _getCategoryColor(transaction.category),
-        child: Text(
-          _getCategoryInitial(transaction.category),
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+  Widget _buildTransactionItem(Transaction transaction) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: _getCategoryColor(transaction.category),
+          child: Text(
+            _getCategoryInitial(transaction.category),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
+        title: Text(transaction.category),
+        subtitle: Text("${transaction.description} • ${DateFormat.yMMMd().format(transaction.date)}"),
+        trailing: Text(
+          '${transaction.isExpense ? '-' : '+'} RS.${transaction.amount.toStringAsFixed(2)}',
+          style: TextStyle(color: transaction.isExpense ? Colors.red : Colors.green, fontWeight: FontWeight.bold),
+        ),
       ),
-      title: Text(transaction.category),
-      subtitle: Text("${transaction.description} • ${DateFormat.yMMMd().format(transaction.date)}"),
-      trailing: Text(
-        '${transaction.isExpense ? '-' : '+'} RS.${transaction.amount.toStringAsFixed(2)}',
-        style: TextStyle(color: transaction.isExpense ? Colors.red : Colors.green, fontWeight: FontWeight.bold),
-      ),
-    ),
-  );
-}
-
-String _getCategoryInitial(String category) {
-  if (category.isEmpty) {
-    return "?";
+    );
   }
-  return category[0].toUpperCase();
-}
 
-Color _getCategoryColor(String category) {
-  if (category.isEmpty) {
-    return Colors.grey.withOpacity(0.2);
+  String _getCategoryInitial(String category) {
+    if (category.isEmpty) return "?";
+    return category[0].toUpperCase();
   }
-  
-  // Using the first character of the category to generate a consistent color
-  final int hashCode = category.toLowerCase().hashCode;
-  
-  // List of distinct colors
-  final colors = [
-    Colors.blue,
-    Colors.red,
-    Colors.green,
-    Colors.orange,
-    Colors.purple,
-    Colors.teal,
-    Colors.pink,
-    Colors.indigo,
-    Colors.amber,
-    Colors.cyan,
-    Colors.deepOrange,
-    Colors.lightBlue,
-  ];
-  
-  return colors[hashCode.abs() % colors.length];
-}
+
+  Color _getCategoryColor(String category) {
+    if (category.isEmpty) return Colors.grey.withOpacity(0.2);
+    final int hashCode = category.toLowerCase().hashCode;
+    final colors = [
+      Colors.blue, Colors.red, Colors.green, Colors.orange, Colors.purple,
+      Colors.teal, Colors.pink, Colors.indigo, Colors.amber, Colors.cyan,
+      Colors.deepOrange, Colors.lightBlue,
+    ];
+    return colors[hashCode.abs() % colors.length];
+  }
 }
