@@ -1,46 +1,21 @@
-import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui';
+// receipt_screen.dart
+import 'package:expense_tracker/controller/reciept_controller.dart';
 import 'package:expense_tracker/model/model.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:flutter/rendering.dart';
+import 'package:get/get.dart';
 
 class ReceiptScreen extends StatelessWidget {
   final Transaction transaction;
-  final GlobalKey _globalKey = GlobalKey();
 
-  ReceiptScreen({super.key, required this.transaction});
-
-  Future<void> _captureAndShareReceipt(BuildContext context) async {
-    try {
-      RenderRepaintBoundary boundary =
-          _globalKey.currentContext!.findRenderObject()
-              as RenderRepaintBoundary;
-      var image = await boundary.toImage(pixelRatio: 3.0);
-      ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
-      Uint8List pngBytes = byteData!.buffer.asUint8List();
-
-      final directory = await getTemporaryDirectory();
-      final imagePath = File('${directory.path}/receipt.png');
-      await imagePath.writeAsBytes(pngBytes);
-
-      await Share.shareXFiles([
-        XFile(imagePath.path),
-      ], text: 'Here is your BudgetPal receipt!');
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error capturing receipt: $e')));
-    }
+  ReceiptScreen({super.key, required this.transaction}) {
+    // Initialize controller when the screen is created
+    Get.put(ReceiptController(transaction: transaction));
   }
 
   @override
   Widget build(BuildContext context) {
-    final formatter = DateFormat('MMM dd, yyyy HH:mm');
-    final formattedDate = formatter.format(transaction.date);
+    // Get the controller
+    final controller = Get.find<ReceiptController>();
 
     return Scaffold(
       backgroundColor: const Color(0xFF1F1D2B),
@@ -54,14 +29,14 @@ class ReceiptScreen extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: controller.goBack,
         ),
       ),
       body: Column(
         children: [
           Expanded(
             child: RepaintBoundary(
-              key: _globalKey,
+              key: controller.receiptKey,
               child: Container(
                 margin: const EdgeInsets.symmetric(
                   horizontal: 24,
@@ -101,7 +76,7 @@ class ReceiptScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            "TID: ${transaction.id}",
+                            "TID: ${controller.transaction.id}",
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 14,
@@ -109,7 +84,7 @@ class ReceiptScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            "On $formattedDate",
+                            "On ${controller.formattedDate}",
                             style: const TextStyle(
                               color: Colors.black54,
                               fontSize: 16,
@@ -150,7 +125,7 @@ class ReceiptScreen extends StatelessWidget {
                           children: [
                             Center(
                               child: Text(
-                                "Rs. ${transaction.amount.toStringAsFixed(2)}",
+                                "Rs. ${controller.formattedAmount}",
                                 style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 22,
@@ -161,8 +136,8 @@ class ReceiptScreen extends StatelessWidget {
                             const SizedBox(height: 8),
                             Center(
                               child: Text(
-                                transaction.isExpense ? 'Expense' : 'Income',
-                                style: TextStyle(
+                                controller.transactionType,
+                                style: const TextStyle(
                                   color: Colors.black54,
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -179,13 +154,13 @@ class ReceiptScreen extends StatelessWidget {
                             const Divider(height: 24),
                             _infoRow(
                               'Category',
-                              transaction.category,
+                              controller.transaction.category,
                               isBold: true,
                             ),
                             const Divider(height: 24),
                             _infoRow(
                               'Payment Method',
-                              transaction.paymentMethod,
+                              controller.transaction.paymentMethod,
                               isBold: true,
                             ),
                             const Divider(height: 24),
@@ -202,7 +177,7 @@ class ReceiptScreen extends StatelessWidget {
                                 const SizedBox(width: 8),
                                 Flexible(
                                   child: Text(
-                                    transaction.description,
+                                    controller.transaction.description,
                                     style: const TextStyle(
                                       color: Colors.black,
                                       fontSize: 16,
@@ -218,7 +193,7 @@ class ReceiptScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           'Thank you for using BudgetPal!',
                           style: TextStyle(
                             color: Colors.black54,
@@ -227,7 +202,7 @@ class ReceiptScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                       Icon(
+                        const Icon(
                           Icons.check_circle,
                           color: Colors.green,
                           size: 26,
@@ -244,7 +219,7 @@ class ReceiptScreen extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () => _captureAndShareReceipt(context),
+              onPressed: () => controller.captureAndShareReceipt(context),
               icon: const Icon(Icons.share, color: Colors.white),
               label: const Text(
                 'Share Receipt',

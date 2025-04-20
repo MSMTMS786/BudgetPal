@@ -1,69 +1,17 @@
+import 'package:expense_tracker/controller/add_transaction_controller.dart';
 import 'package:expense_tracker/model/model.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class AddTransactionScreen extends StatefulWidget {
+class AddTransactionScreen extends StatelessWidget {
   final Transaction? transaction;
-  const AddTransactionScreen({super.key, this.transaction});
-
-  @override
-  _AddTransactionScreenState createState() => _AddTransactionScreenState();
-}
-
-class _AddTransactionScreenState extends State<AddTransactionScreen> {
-  String amount = "0";
-  String? selectedCategory;
-  String? selectedPaymentMethod;
-  bool isIncome = true;
-  late TextEditingController _descriptionController;
-
-  @override
-  void initState() {
-    super.initState();
-    final t = widget.transaction;
-    _descriptionController = TextEditingController(
-        text: t != null ? t.description : "");
-    if (t != null) {
-      amount = t.amount.toStringAsFixed(0);
-      selectedCategory = t.category;
-      selectedPaymentMethod = t.paymentMethod;
-      isIncome = !t.isExpense;
-    }
-  }
-
-  void updateAmount(String value) {
-    setState(() {
-      if (amount == "0" && value != ".") {
-        amount = value;
-      } else {
-        if (value == "." && amount.contains(".")) return;
-        amount += value;
-      }
-    });
-  }
-
-  void _deleteDigit() {
-    setState(() {
-      amount = amount.length > 1 ? amount.substring(0, amount.length - 1) : "0";
-    });
-  }
-
-  void _addTransaction() {
-    final transaction = Transaction(
-      id: widget.transaction?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
-      amount: double.tryParse(amount) ?? 0.0,
-      isExpense: !isIncome,
-      category: selectedCategory ?? (isIncome ? "Income" : "Expense"),
-      description: _descriptionController.text.isEmpty
-          ? "No description"
-          : _descriptionController.text,
-      date: DateTime.now(),
-      paymentMethod: selectedPaymentMethod ?? "Cash",
-    );
-    Navigator.pop(context, transaction);
-  }
+  
+  const AddTransactionScreen({Key? key, this.transaction}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(AddTransactionController(editTransaction: transaction));
+
     return Scaffold(
       backgroundColor: const Color(0xFF1F1D2B),
       appBar: AppBar(
@@ -71,7 +19,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Get.back(),
         ),
       ),
       body: Column(
@@ -86,12 +34,12 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             child: Row(
               children: [
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => isIncome = true),
+                  child: Obx(() => GestureDetector(
+                    onTap: () => controller.isIncome.value = true,
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: isIncome ? Colors.green : Colors.transparent,
+                        color: controller.isIncome.value ? Colors.green : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       alignment: Alignment.center,
@@ -103,15 +51,15 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         ),
                       ),
                     ),
-                  ),
+                  )),
                 ),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => isIncome = false),
+                  child: Obx(() => GestureDetector(
+                    onTap: () => controller.isIncome.value = false,
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: !isIncome ? Colors.red : Colors.transparent,
+                        color: !controller.isIncome.value ? Colors.red : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       alignment: Alignment.center,
@@ -123,7 +71,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         ),
                       ),
                     ),
-                  ),
+                  )),
                 ),
               ],
             ),
@@ -134,7 +82,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                DropdownButton<String>(
+                Obx(() => DropdownButton<String>(
                   dropdownColor: const Color(0xFF1F1D2B),
                   underline: Container(),
                   icon: const Icon(
@@ -146,9 +94,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     "Payment Method",
                     style: TextStyle(color: Colors.white70),
                   ),
-                  value: selectedPaymentMethod,
-                  onChanged: (value) =>
-                      setState(() => selectedPaymentMethod = value),
+                  value: controller.selectedPaymentMethod.value,
+                  onChanged: (value) => controller.selectedPaymentMethod.value = value,
                   items: const [
                     DropdownMenuItem(value: "Cash", child: Text("Cash")),
                     DropdownMenuItem(value: "Card", child: Text("Card")),
@@ -157,9 +104,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       child: Text("Online Transfer"),
                     ),
                   ],
-                ),
-                if (!isIncome)
-                  DropdownButton<String>(
+                )),
+                Obx(() => controller.isIncome.value 
+                  ? Container() 
+                  : DropdownButton<String>(
                     dropdownColor: const Color(0xFF1F1D2B),
                     underline: Container(),
                     icon: const Icon(
@@ -171,9 +119,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       "Category",
                       style: TextStyle(color: Colors.white70),
                     ),
-                    value: selectedCategory,
-                    onChanged: (value) =>
-                        setState(() => selectedCategory = value),
+                    value: controller.selectedCategory.value,
+                    onChanged: (value) => controller.selectedCategory.value = value,
                     items: const [
                       DropdownMenuItem(value: "Food", child: Text("Food")),
                       DropdownMenuItem(
@@ -191,25 +138,26 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       DropdownMenuItem(value: "Other", child: Text("Other")),
                     ],
                   ),
+                ),
               ],
             ),
           ),
 
           const SizedBox(height: 10),
 
-          Text(
-            "RS. $amount",
+          Obx(() => Text(
+            "RS. ${controller.amount.value}",
             style: const TextStyle(
               color: Colors.white,
               fontSize: 36,
               fontWeight: FontWeight.bold,
             ),
-          ),
+          )),
 
           Padding(
             padding: const EdgeInsets.all(15),
             child: TextField(
-              controller: _descriptionController,
+              controller: controller.descriptionController,
               decoration: const InputDecoration(
                 hintText: "Add Description",
                 hintStyle: TextStyle(color: Colors.grey),
@@ -230,20 +178,21 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ),
               onPressed: () {
-                if (amount != "0" &&
-                    _descriptionController.text.trim().isNotEmpty) {
-                  _addTransaction();
+                if (controller.isValid()) {
+                  final transaction = controller.createTransaction();
+                  Get.back(result: transaction);
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                          "Please enter a valid amount and description."),
-                    ),
+                  Get.snackbar(
+                    'Invalid Input',
+                    'Please enter a valid amount and description.',
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
                   );
                 }
               },
               child: Text(
-                widget.transaction == null ? "Tap to ADD" : " UPDATE ",
+                transaction == null ? "Tap to ADD" : " UPDATE ",
                 style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
@@ -256,15 +205,16 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               crossAxisCount: 3,
               crossAxisSpacing: 2,
               mainAxisSpacing: 10,
-              childAspectRatio: 2,
+              childAspectRatio: 1.5,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               children: [
                 ...List.generate(
                   9,
-                  (i) => _buildNumberButton((i + 1).toString()),
+                  (i) => _buildNumberButton((i + 1).toString(), controller),
                 ),
-                _buildNumberButton("."),
-                _buildNumberButton("0"),
-                _buildDeleteButton(),
+                _buildNumberButton(".", controller),
+                _buildNumberButton("0", controller),
+                _buildDeleteButton(controller),
               ],
             ),
           ),
@@ -273,9 +223,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     );
   }
 
-  Widget _buildNumberButton(String digit) {
+  Widget _buildNumberButton(String digit, AddTransactionController controller) {
     return GestureDetector(
-      onTap: () => updateAmount(digit),
+      onTap: () => controller.updateAmount(digit),
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
@@ -294,9 +244,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     );
   }
 
-  Widget _buildDeleteButton() {
+  Widget _buildDeleteButton(AddTransactionController controller) {
     return InkWell(
-      onTap: _deleteDigit,
+      onTap: () => controller.deleteDigit(),
       child: Container(
         alignment: Alignment.center,
         decoration: const BoxDecoration(

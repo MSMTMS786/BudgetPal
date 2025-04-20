@@ -1,21 +1,24 @@
-import 'package:expense_tracker/screen/transaction_history.dart';
+// drawer.dart
+import 'package:expense_tracker/controller/drawer_controller.dart' as drawer_controller;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:expense_tracker/model/model.dart';
-// Import your transactions list screen
 
 
-class MyDrawer extends StatefulWidget {
+class MyDrawer extends StatelessWidget {
   final List<Transaction> transactions;
   
-  const MyDrawer({super.key, required this.transactions});
+  MyDrawer({Key? key, required this.transactions}) : super(key: key) {
+    // Initialize controller
+    final controller = Get.put(drawer_controller.DrawerController());
+    // Update transactions in controller
+    controller.setTransactions(transactions);
+  }
   
   @override
-  State<MyDrawer> createState() => _MyDrawerState();
-}
-
-class _MyDrawerState extends State<MyDrawer> {
-  @override
   Widget build(BuildContext context) {
+    final controller = Get.find<drawer_controller.DrawerController>();
+    
     return Drawer(
       child: Container(
         color: Color(0xFF121329), // Dark background color
@@ -59,108 +62,67 @@ class _MyDrawerState extends State<MyDrawer> {
                     Icons.workspace_premium,
                     'Get Premium',
                     context,
-                    () {
-                      Navigator.pop(context);
-                      // Navigate to Premium screen
-                    },
+                    () => controller.navigateToPremium(context),
                   ),
                   _buildDrawerItem(
                     Icons.insert_chart, 
                     'Records', 
                     context,
-                    () {
-                      Navigator.pop(context);
-                      // Navigate to Records screen
-                    },
+                    () => controller.navigateToRecords(context),
                   ),
                   _buildDrawerItem(
                     Icons.account_balance, 
                     'Bank Sync', 
                     context,
-                    () {
-                      Navigator.pop(context);
-                      // Navigate to Bank Sync screen
-                    },
+                    () => controller.navigateToBankSync(context),
                   ),
                   _buildDrawerItem(
                     Icons.upload_file, 
                     'Imports', 
                     context,
-                    () {
-                      Navigator.pop(context);
-                      // Navigate to Imports screen
-                    },
+                    () => controller.navigateToImports(context),
                   ),
                   _buildDrawerItem(
                     Icons.receipt, 
                     'Receipts', 
                     context,
-                    () {
-                      Navigator.pop(context);
-                      // Navigate to Transactions List Screen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TransactionsListScreen(
-                            transactions: widget.transactions,
-                          ),
-                        ),
-                      );
-                    },
+                    () => controller.navigateToTransactionHistory(context),
                   ),
                   _buildDrawerItem(
                     Icons.label, 
                     'Tags', 
                     context,
-                    () {
-                      Navigator.pop(context);
-                      // Navigate to Tags screen
-                    },
+                    () => controller.navigateToTags(context),
                   ),
                   _buildDrawerItem(
                     Icons.credit_card, 
                     'Cards', 
                     context,
-                    () {
-                      Navigator.pop(context);
-                      // Navigate to Cards screen
-                    },
+                    () => controller.navigateToCards(context),
                   ),
                   _buildDrawerItem(
                     Icons.account_balance_wallet,
                     'Set Budget',
                     context,
-                    () {
-                      Navigator.pop(context);
-                      // Navigate to Budget screen
-                    },
+                    () => controller.navigateToBudget(context),
                   ),
                   _buildDrawerItem(
                     Icons.lock, 
                     'CVV', 
                     context,
-                    () {
-                      Navigator.pop(context);
-                      // Navigate to CVV screen
-                    },
+                    () => controller.navigateToCVV(context),
                   ),
                   _buildDrawerItem(
                     Icons.list, 
                     'Lists', 
                     context,
-                    () {
-                      Navigator.pop(context);
-                      // Navigate to Lists screen
-                    },
+                    () => controller.navigateToLists(context),
                   ),
                   _buildDrawerItem(
                     Icons.settings, 
                     'Setting', 
                     context,
-                    () {
-                      Navigator.pop(context);
-                      // Navigate to Settings screen
-                    },
+                    () => controller.navigateToSettings(context),
                   ),
                 ],
               ),

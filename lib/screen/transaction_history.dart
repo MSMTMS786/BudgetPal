@@ -1,15 +1,23 @@
+// transaction_history.dart
+import 'package:expense_tracker/controller/history_controller.dart';
 import 'package:expense_tracker/model/model.dart';
-import 'package:expense_tracker/screen/reciept_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class TransactionsListScreen extends StatelessWidget {
   final List<Transaction> transactions;
 
-  const TransactionsListScreen({super.key, required this.transactions});
+  TransactionsListScreen({super.key, required this.transactions}) {
+    // Initialize controller with provided transactions
+    Get.put(TransactionHistoryController(initialTransactions: transactions));
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Get controller instance
+    final controller = Get.find<TransactionHistoryController>();
+    
     return Scaffold(
       backgroundColor: const Color(0xFF1F1D2B),
       appBar: AppBar(
@@ -21,33 +29,68 @@ class TransactionsListScreen extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-      ),
-      body: transactions.isEmpty
-          ? const Center(
-              child: Text(
-                'No transactions yet!',
-                style: TextStyle(color: Colors.white70, fontSize: 18),
+        // Additional actions could be added here
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.filter_list, color: Colors.white),
+            onSelected: (value) {
+              // Handle filter selection
+              if (value == 'all') {
+                // No filtering needed, already shows all
+              } else if (value == 'expenses') {
+                // You could implement a filtered view here
+              } else if (value == 'income') {
+                // You could implement a filtered view here
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'all',
+                child: Text('All Transactions'),
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: transactions.length,
-              itemBuilder: (context, index) {
-                final transaction = transactions[index];
-                return TransactionCard(
-                  transaction: transaction,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ReceiptScreen(transaction: transaction),
-                      ),
-                    );
-                  },
-                );
-              },
+              const PopupMenuItem(
+                value: 'expenses',
+                child: Text('Expenses Only'),
+              ),
+              const PopupMenuItem(
+                value: 'income',
+                child: Text('Income Only'),
+              ),
+            ],
+          )
+        ],
+      ),
+      body: Obx(() {
+        if (controller.transactions.isEmpty) {
+          return const Center(
+            child: Text(
+              'No transactions yet!',
+              style: TextStyle(color: Colors.white70, fontSize: 18),
             ),
-      
+          );
+        }
+        
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: controller.transactions.length,
+          itemBuilder: (context, index) {
+            final transaction = controller.transactions[index];
+            return TransactionCard(
+              transaction: transaction,
+              onTap: () => controller.viewTransactionReceipt(transaction),
+            );
+          },
+        );
+      }),
+      // You could add a FAB here to add new transactions
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.amber,
+        child: const Icon(Icons.add),
+        onPressed: () {
+          // Navigate to add transaction screen or show a dialog
+          // This would be implemented in your app
+        },
+      ),
     );
   }
 }
@@ -74,51 +117,89 @@ class TransactionCard extends StatelessWidget {
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       color: const Color(0xFF252836),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        onTap: onTap,
-        leading: Container(
-          width: 48,
-          height: 48,
+      child: Dismissible(
+        key: Key(transaction.id),
+        background: Container(
           decoration: BoxDecoration(
-            color: color.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(12),
+            color: Colors.red,
+            borderRadius: BorderRadius.circular(16),
           ),
-          child: Icon(
-            transaction.isExpense ? Icons.arrow_downward : Icons.arrow_upward,
-            color: color,
-          ),
-        ),
-        title: Text(
-          transaction.category,
-          style: const TextStyle(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 20),
+          child: const Icon(
+            Icons.delete,
             color: Colors.white,
-            fontWeight: FontWeight.bold,
           ),
         ),
-        subtitle: Text(
-          transaction.description,
-          style: const TextStyle(color: Colors.white70),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '$sign RS. ${transaction.amount.toStringAsFixed(2)}',
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+        direction: DismissDirection.endToStart,
+        onDismissed: (direction) {
+          // Delete the transaction
+          Get.find<TransactionHistoryController>().deleteTransaction(transaction.id);
+          // Show a snackbar for feedback
+          Get.snackbar(
+            'Transaction Deleted',
+            'Transaction has been removed',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red.withOpacity(0.7),
+            colorText: Colors.white,
+            duration: const Duration(seconds: 3),
+            mainButton: TextButton(
+              onPressed: () {
+                // You could implement an undo function here
+              },
+              child: const Text(
+                'UNDO',
+                style: TextStyle(color: Colors.white),
               ),
             ),
-            Text(
-              formattedDate,
-              style: const TextStyle(color: Colors.white70, fontSize: 12),
+          );
+        },
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          onTap: onTap,
+          leading: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
             ),
-          ],
+            child: Icon(
+              transaction.isExpense ? Icons.arrow_downward : Icons.arrow_upward,
+              color: color,
+            ),
+          ),
+          title: Text(
+            transaction.category,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          subtitle: Text(
+            transaction.description,
+            style: const TextStyle(color: Colors.white70),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '$sign RS. ${transaction.amount.toStringAsFixed(2)}',
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              Text(
+                formattedDate,
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
+            ],
+          ),
         ),
       ),
     );

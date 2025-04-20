@@ -1,81 +1,18 @@
-// Keep your imports as is
 import 'package:expense_tracker/model/model.dart';
 import 'package:expense_tracker/screen/add_expense_income.dart';
 import 'package:expense_tracker/widgets/Drawer.dart';
-import 'package:expense_tracker/model/shared_pref_helper.dart';
 import 'package:expense_tracker/widgets/bottomNavBar.dart';
+import 'package:expense_tracker/controller/transaction_controller.dart';
+import 'package:expense_tracker/controller/reciept_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  HomeScreen({Key? key}) : super(key: key);
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  double balance = 0.0;
-  double totalExpenses = 0.0;
-  double totalIncome = 0.0;
-  List<Transaction> transactions = [];
-  bool _isLoading = true;
-
+  final TransactionController transactionController = Get.put(TransactionController());
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  @override
-  void initState() {
-    super.initState();
-    _loadTransactions();
-  }
-
-  Future<void> _loadTransactions() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    List<Transaction> loadedTransactions = await SharedPrefsHelper.loadTransactions();
-
-    if (mounted) {
-      setState(() {
-        transactions = loadedTransactions;
-        _calculateBalances();
-        _isLoading = false;
-      });
-    }
-  }
-
-  void _calculateBalances() {
-    balance = 0.0;
-    totalExpenses = 0.0;
-    totalIncome = 0.0;
-
-    for (var transaction in transactions) {
-      if (transaction.isExpense) {
-        totalExpenses += transaction.amount;
-        balance -= transaction.amount;
-      } else {
-        totalIncome += transaction.amount;
-        balance += transaction.amount;
-      }
-    }
-  }
-
-  void addTransaction(Transaction transaction) {
-    setState(() {
-      transactions.add(transaction);
-      _calculateBalances();
-      SharedPrefsHelper.saveTransactions(transactions);
-    });
-  }
-
-  Future<void> _deleteTransaction(int index) async {
-    setState(() {
-      transactions.removeAt(index);
-      _calculateBalances();
-      SharedPrefsHelper.saveTransactions(transactions);
-    });
-  }
 
   Future<bool> _confirmDelete(BuildContext context, Transaction transaction) async {
     bool confirm = false;
@@ -109,21 +46,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return confirm;
   }
 
-  double get expensePercentage {
-    final total = totalExpenses + totalIncome;
-    return total <= 0 ? 0.0 : (totalExpenses / total);
-  }
-
-  double get incomePercentage {
-    final total = totalExpenses + totalIncome;
-    return total <= 0 ? 0.0 : (totalIncome / total);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: MyDrawer(transactions: transactions),
+      drawer: Obx(() => MyDrawer(transactions: transactionController.transactions)),
       appBar: AppBar(
         backgroundColor: const Color(0xFF3F0D49),
         title: const Text('BudgetPal', style: TextStyle(color: Colors.white)),
@@ -143,122 +70,122 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         child: SafeArea(
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)))
-              : Column(
-                  children: [
-                    const SizedBox(height: 20),
-                    Center(
-                      child: Column(
-                        children: [
-                          const Text('Available Balance', style: TextStyle(color: Color(0xFFFFD700), fontSize: 14)),
-                          const SizedBox(height: 8),
-                          Text("RS ${balance.toStringAsFixed(2)}",
-                              style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        children: [
-                          _buildGraph("Expenses", expensePercentage, Colors.red),
-                          const SizedBox(height: 10),
-                          _buildGraph("Income", incomePercentage, Colors.green),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('My Transactions', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)),
-                          FloatingActionButton(
-                            onPressed: () async {
-                              final result = await Navigator.push<Transaction>(
-                                context,
-                                MaterialPageRoute(builder: (context) => const AddTransactionScreen()),
-                              );
-                              if (result != null) {
-                                addTransaction(result);
-                              }
-                            },
-                            backgroundColor: const Color(0xFFFFD700),
-                            child: const Icon(Icons.add, color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: transactions.isEmpty
-                          ? const Center(
-                              child: Text('No transactions yet', style: TextStyle(color: Colors.white)),
-                            )
-                          : ListView.builder(
-                              itemCount: transactions.length,
-                              itemBuilder: (context, index) {
-                                final reversedIndex = transactions.length - 1 - index;
-                                final transaction = transactions[reversedIndex];
-
-                                return Dismissible(
-                                  key: UniqueKey(),
-                                  background: Container(
-                                    alignment: Alignment.centerLeft,
-                                    padding: const EdgeInsets.only(left: 20.0),
-                                    color: Colors.blue,
-                                    child: const Icon(Icons.edit, color: Colors.white),
-                                  ),
-                                  secondaryBackground: Container(
-                                    alignment: Alignment.centerRight,
-                                    padding: const EdgeInsets.only(right: 20.0),
-                                    color: Colors.red,
-                                    child: const Icon(Icons.delete, color: Colors.white),
-                                  ),
-                                  confirmDismiss: (direction) async {
-                                    if (direction == DismissDirection.startToEnd) {
-                                      final editedTransaction = await Navigator.push<Transaction>(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => AddTransactionScreen(transaction: transaction),
-                                        ),
-                                      );
-
-                                      if (editedTransaction != null) {
-                                        setState(() {
-                                          transactions[reversedIndex] = editedTransaction;
-                                          SharedPrefsHelper.saveTransactions(transactions);
-                                          _calculateBalances();
-                                        });
-                                      }
-
-                                      return false; // Don't dismiss the tile
-                                    } else if (direction == DismissDirection.endToStart) {
-                                      return await _confirmDelete(context, transaction);
-                                    }
-                                    return false;
-                                  },
-                                  onDismissed: (direction) {
-                                    if (direction == DismissDirection.endToStart) {
-                                      _deleteTransaction(reversedIndex);
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text('${transaction.category} transaction deleted'),
-                                          duration: const Duration(seconds: 2),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  child: _buildTransactionItem(transaction),
-                                );
-                              },
-                            ),
-                    ),
-                  ],
+          child: Obx(() {
+            if (transactionController.isLoading.value) {
+              return const Center(child: CircularProgressIndicator(color: Color(0xFFFFD700)));
+            }
+            
+            return Column(
+              children: [
+                const SizedBox(height: 20),
+                Center(
+                  child: Column(
+                    children: [
+                      const Text('Available Balance', style: TextStyle(color: Color(0xFFFFD700), fontSize: 14)),
+                      const SizedBox(height: 8),
+                      Obx(() => Text(
+                        "RS ${transactionController.balance.value.toStringAsFixed(2)}",
+                        style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)
+                      )),
+                    ],
+                  ),
                 ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    children: [
+                      Obx(() => _buildGraph("Expenses", transactionController.expensePercentage, Colors.red)),
+                      const SizedBox(height: 10),
+                      Obx(() => _buildGraph("Income", transactionController.incomePercentage, Colors.green)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('My Transactions', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500)),
+                      FloatingActionButton(
+                        onPressed: () async {
+                          final result = await Get.to(() => const AddTransactionScreen());
+                          if (result != null) {
+                            transactionController.addTransaction(result);
+                          }
+                        },
+                        backgroundColor: const Color(0xFFFFD700),
+                        child: const Icon(Icons.add, color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: Obx(() {
+                    if (transactionController.transactions.isEmpty) {
+                      return const Center(
+                        child: Text('No transactions yet', style: TextStyle(color: Colors.white)),
+                      );
+                    }
+                    
+                    return ListView.builder(
+                      itemCount: transactionController.transactions.length,
+                      itemBuilder: (context, index) {
+                        final reversedIndex = transactionController.transactions.length - 1 - index;
+                        final transaction = transactionController.transactions[reversedIndex];
+
+                        return Dismissible(
+                          key: UniqueKey(),
+                          background: Container(
+                            alignment: Alignment.centerLeft,
+                            padding: const EdgeInsets.only(left: 20.0),
+                            color: Colors.blue,
+                            child: const Icon(Icons.edit, color: Colors.white),
+                          ),
+                          secondaryBackground: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 20.0),
+                            color: Colors.red,
+                            child: const Icon(Icons.delete, color: Colors.white),
+                          ),
+                          confirmDismiss: (direction) async {
+                            if (direction == DismissDirection.startToEnd) {
+                              final editedTransaction = await Get.to(
+                                () => AddTransactionScreen(transaction: transaction)
+                              );
+
+                              if (editedTransaction != null) {
+                                transactionController.updateTransaction(transaction.id, editedTransaction);
+                              }
+
+                              return false; // Don't dismiss the tile
+                            } else if (direction == DismissDirection.endToStart) {
+                              return await _confirmDelete(context, transaction);
+                            }
+                            return false;
+                          },
+                          onDismissed: (direction) {
+                            if (direction == DismissDirection.endToStart) {
+                              transactionController.deleteTransaction(reversedIndex);
+                              Get.snackbar(
+                                'Transaction Deleted', 
+                                '${transaction.category} transaction deleted',
+                                snackPosition: SnackPosition.BOTTOM,
+                                duration: const Duration(seconds: 2)
+                              );
+                            }
+                          },
+                          child: _buildTransactionItem(transaction),
+                        );
+                      },
+                    );
+                  }),
+                ),
+              ],
+            );
+          }),
         ),
       ),
     );
