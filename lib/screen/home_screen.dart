@@ -1,9 +1,7 @@
 import 'package:expense_tracker/model/model.dart';
 import 'package:expense_tracker/screen/add_expense_income.dart';
 import 'package:expense_tracker/widgets/Drawer.dart';
-import 'package:expense_tracker/widgets/bottomNavBar.dart';
 import 'package:expense_tracker/controller/transaction_controller.dart';
-import 'package:expense_tracker/controller/reciept_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';

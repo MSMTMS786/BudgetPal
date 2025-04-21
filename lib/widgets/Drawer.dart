@@ -78,9 +78,9 @@ class MyDrawer extends StatelessWidget {
                   ),
                   _buildDrawerItem(
                     Icons.upload_file, 
-                    'Imports', 
+                    'Statement', 
                     context,
-                    () => controller.navigateToImports(context),
+                    () => controller.navigateToStatement(context),
                   ),
                   _buildDrawerItem(
                     Icons.receipt, 

@@ -4,7 +4,8 @@ import 'package:get/route_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(GetMaterialApp(
+  runApp(GetMaterialApp
+  (
     debugShowCheckedModeBanner: false,
      home: SplashScreen()
      )

@@ -1,4 +1,3 @@
-// transaction_history.dart
 import 'package:expense_tracker/controller/history_controller.dart';
 import 'package:expense_tracker/model/model.dart';
 import 'package:flutter/material.dart';
@@ -26,42 +25,30 @@ class TransactionsListScreen extends StatelessWidget {
         elevation: 0,
         title: const Text(
           'Transactions',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white, 
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
         ),
         centerTitle: true,
-        // Additional actions could be added here
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.filter_list, color: Colors.white),
             onSelected: (value) {
               // Handle filter selection
-              if (value == 'all') {
-                // No filtering needed, already shows all
-              } else if (value == 'expenses') {
-                // You could implement a filtered view here
-              } else if (value == 'income') {
-                // You could implement a filtered view here
-              }
+              controller.filterTransactions(value);
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'all',
-                child: Text('All Transactions'),
-              ),
-              const PopupMenuItem(
-                value: 'expenses',
-                child: Text('Expenses Only'),
-              ),
-              const PopupMenuItem(
-                value: 'income',
-                child: Text('Income Only'),
-              ),
+              const PopupMenuItem(value: 'all', child: Text('All Transactions')),
+              const PopupMenuItem(value: 'expenses', child: Text('Expenses Only')),
+              const PopupMenuItem(value: 'income', child: Text('Income Only')),
             ],
-          )
+          ),
         ],
       ),
       body: Obx(() {
-        if (controller.transactions.isEmpty) {
+        if (controller.filteredTransactions.isEmpty) {
           return const Center(
             child: Text(
               'No transactions yet!',
@@ -72,9 +59,9 @@ class TransactionsListScreen extends StatelessWidget {
         
         return ListView.builder(
           padding: const EdgeInsets.all(16),
-          itemCount: controller.transactions.length,
+          itemCount: controller.filteredTransactions.length,
           itemBuilder: (context, index) {
-            final transaction = controller.transactions[index];
+            final transaction = controller.filteredTransactions[index];
             return TransactionCard(
               transaction: transaction,
               onTap: () => controller.viewTransactionReceipt(transaction),
@@ -82,13 +69,11 @@ class TransactionsListScreen extends StatelessWidget {
           },
         );
       }),
-      // You could add a FAB here to add new transactions
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.amber,
-        child: const Icon(Icons.add),
+        backgroundColor: const Color(0xFF1F1D2B),
+        child: const Icon(Icons.add, color: Colors.white),
         onPressed: () {
           // Navigate to add transaction screen or show a dialog
-          // This would be implemented in your app
         },
       ),
     );
@@ -107,14 +92,14 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formatter = DateFormat('MMM dd');
+    final formatter = DateFormat('MMM dd, yyyy');
     final formattedDate = formatter.format(transaction.date);
     final color = transaction.isExpense ? Colors.red : Colors.green;
     final sign = transaction.isExpense ? '-' : '+';
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      elevation: 4,
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      elevation: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       color: const Color(0xFF252836),
       child: Dismissible(
@@ -133,9 +118,7 @@ class TransactionCard extends StatelessWidget {
         ),
         direction: DismissDirection.endToStart,
         onDismissed: (direction) {
-          // Delete the transaction
           Get.find<TransactionHistoryController>().deleteTransaction(transaction.id);
-          // Show a snackbar for feedback
           Get.snackbar(
             'Transaction Deleted',
             'Transaction has been removed',
@@ -145,7 +128,7 @@ class TransactionCard extends StatelessWidget {
             duration: const Duration(seconds: 3),
             mainButton: TextButton(
               onPressed: () {
-                // You could implement an undo function here
+                // Implement undo functionality here
               },
               child: const Text(
                 'UNDO',
@@ -155,13 +138,13 @@ class TransactionCard extends StatelessWidget {
           );
         },
         child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           onTap: onTap,
           leading: Container(
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -174,12 +157,13 @@ class TransactionCard extends StatelessWidget {
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
           ),
           subtitle: Text(
             transaction.description,
             style: const TextStyle(color: Colors.white70),
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           trailing: Column(
@@ -191,7 +175,7 @@ class TransactionCard extends StatelessWidget {
                 style: TextStyle(
                   color: color,
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: 18,
                 ),
               ),
               Text(
