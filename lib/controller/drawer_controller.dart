@@ -1,4 +1,10 @@
+import 'package:expense_tracker/screen/budget_screen.dart';
+import 'package:expense_tracker/screen/cards_screen.dart';
+import 'package:expense_tracker/screen/cv_screen.dart';
+import 'package:expense_tracker/screen/list_screen.dart';
+import 'package:expense_tracker/screen/settings.dart';
 import 'package:expense_tracker/screen/statement.dart';
+import 'package:expense_tracker/screen/tag_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:expense_tracker/model/model.dart';
@@ -26,50 +32,74 @@ class DrawerController extends GetxController {
   void navigateToPremium(BuildContext context) {
     Get.back();
     // Get.to(() => PremiumScreen());
+    Get.snackbar(
+      'Coming Soon',
+      'Premium features will be available in the next update',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: Duration(seconds: 2),
+    );
   }
 
   void navigateToRecords(BuildContext context) {
     Get.back();
     // Get.to(() => RecordsScreen());
+    Get.snackbar(
+      'Coming Soon',
+      'Records screen will be available in the next update',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: Duration(seconds: 2),
+    );
   }
 
   void navigateToBankSync(BuildContext context) {
     Get.back();
     // Get.to(() => BankSyncScreen());
+    Get.snackbar(
+      'Coming Soon',
+      'Bank sync feature will be available in the next update',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: Duration(seconds: 2),
+    );
   }
 
   void navigateToImports(BuildContext context) {
     Get.back();
     // Get.to(() => ImportsScreen());
+    Get.snackbar(
+      'Coming Soon',
+      'Import feature will be available in the next update',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: Duration(seconds: 2),
+    );
   }
 
   void navigateToTags(BuildContext context) {
     Get.back();
-    // Get.to(() => TagsScreen());
+    Get.to(() => TagsScreen());
   }
 
   void navigateToCards(BuildContext context) {
     Get.back();
-    // Get.to(() => CardsScreen());
+    Get.to(() => CardsScreen());
   }
 
   void navigateToBudget(BuildContext context) {
     Get.back();
-    // Get.to(() => BudgetScreen());
+    Get.to(() => SetBudgetScreen());
   }
 
   void navigateToCVV(BuildContext context) {
     Get.back();
-    // Get.to(() => CVVScreen());
+    Get.to(() => CVVScreen());
   }
 
   void navigateToLists(BuildContext context) {
     Get.back();
-    // Get.to(() => ListsScreen());
+    Get.to(() => ListsScreen());
   }
 
   void navigateToSettings(BuildContext context) {
     Get.back();
-    // Get.to(() => SettingsScreen());
+    Get.to(() => SettingsScreen());
   }
 }

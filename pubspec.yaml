@@ -42,6 +42,7 @@ dependencies:
   path_provider: ^2.1.2
   pdf: ^3.10.1
   printing: ^5.10.5
+  fl_chart: ^0.71.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

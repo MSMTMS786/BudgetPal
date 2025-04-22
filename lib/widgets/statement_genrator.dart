@@ -42,12 +42,12 @@ class StatementGenerator {
                         color: PdfColors.white,
                       )),
                   pw.SizedBox(height: 8),
-                  pw.Text('Total Available Balance: RS${balance.toStringAsFixed(2)}',
+                  pw.Text('Total Available Balance:\nRS: ${balance.toStringAsFixed(2)}',
                       style: pw.TextStyle(
                         fontSize: 14,
                         color: PdfColors.white,
                       )),
-                  pw.Text('Total Expense: RS${totalExpense.toStringAsFixed(2)}',
+                  pw.Text('Total Expense:\n RS: ${totalExpense.toStringAsFixed(2)}',
                       style: pw.TextStyle(
                         fontSize: 14,
                         color: PdfColors.white,
