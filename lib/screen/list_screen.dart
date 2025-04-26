@@ -1,109 +1,212 @@
-// lists_screen.dart
+import 'package:expense_tracker/controller/transaction_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:expense_tracker/model/model.dart';
 
-class ListsScreen extends StatefulWidget {
-  const ListsScreen({Key? key}) : super(key: key);
+class ListsScreen extends StatelessWidget {
+  final TransactionController transactionController = Get.find();
 
-  @override
-  State<ListsScreen> createState() => _ListsScreenState();
-}
-
-class _ListsScreenState extends State<ListsScreen> {
-  final List<Map<String, dynamic>> _transactionLists = [
-    {
-      'name': 'Monthly Bills',
-      'count': 8,
-      'total': 1250.0,
-      'icon': Icons.receipt,
-      'color': Colors.blue,
-    },
-    {
-      'name': 'Subscriptions',
-      'count': 5,
-      'total': 85.0,
-      'icon': Icons.subscriptions,
-      'color': Colors.purple,
-    },
-    {
-      'name': 'Grocery Shopping',
-      'count': 12,
-      'total': 420.0,
-      'icon': Icons.shopping_basket,
-      'color': Colors.green,
-    },
-    {
-      'name': 'Dining Out',
-      'count': 7,
-      'total': 310.0,
-      'icon': Icons.restaurant,
-      'color': Colors.orange,
-    },
-  ];
+  ListsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Transaction Lists'),
-        backgroundColor: Colors.blue[900],
+        elevation: 0,
+        title: const Text(
+          'Transactions',
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        backgroundColor: Colors.blue,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
+      body: Obx(() {
+        final List<Transaction> transactions = transactionController.transactions;
+
+        final Map<String, Map<String, dynamic>> categorizedData = {};
+        double totalIncome = 0.0;
+        double totalExpense = 0.0;
+
+        for (var tx in transactions) {
+          if (!categorizedData.containsKey(tx.category)) {
+            categorizedData[tx.category] = {
+              'count': 0,
+              'total': 0.0,
+              'icon': _getCategoryIcon(tx.category),
+              'color': _getCategoryColor(tx.category),
+            };
+          }
+
+          categorizedData[tx.category]!['count'] += 1;
+          categorizedData[tx.category]!['total'] += tx.amount;
+
+          if (tx.isExpense) {
+            totalExpense += tx.amount;
+          } else {
+            totalIncome += tx.amount;
+          }
+        }
+
+        return Column(
+          children: [
+            // Simple Income/Expense summary
+            Padding(
               padding: const EdgeInsets.all(16),
-              itemCount: _transactionLists.length,
-              itemBuilder: (context, index) {
-                final list = _transactionLists[index];
-                return Card(
-                  elevation: 2,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: ListTile(
-                    onTap: () {
-                      // Navigate to list details
-                    },
-                    leading: CircleAvatar(
-                      backgroundColor: list['color'],
-                      child: Icon(
-                        list['icon'],
-                        color: Colors.white,
-                      ),
-                    ),
-                    title: Text(
-                      list['name'],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    subtitle: Text(
-                      '${list['count']} transactions',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    trailing: Text(
-                      '\$${list['total'].toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildSummaryCard('Income', totalIncome, Colors.green),
                   ),
-                );
-              },
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildSummaryCard('Expense', totalExpense, Colors.red),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Categories heading
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Categories',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+              ),
+            ),
+            
+            // Divider
+            Divider(color: Colors.grey[200]),
+            
+            // Categories list
+            Expanded(
+              child: categorizedData.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No transactions yet',
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: categorizedData.length,
+                      separatorBuilder: (context, index) => Divider(
+                        height: 1,
+                        color: Colors.grey[200],
+                      ),
+                      itemBuilder: (context, index) {
+                        final category = categorizedData.keys.elementAt(index);
+                        final data = categorizedData[category]!;
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 20,
+                                backgroundColor: data['color'].withOpacity(0.1),
+                                child: Icon(
+                                  data['icon'],
+                                  color: data['color'],
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      category,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${data['count']} transactions',
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                'RS ${data['total'].toStringAsFixed(2)}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                  color: Colors.grey[800],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        );
+      }),
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey[400],
+        currentIndex: 1,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_balance_outlined),
+            label: 'Transactions',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard(String title, double amount, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 14,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: ElevatedButton(
-              onPressed: () {
-                _showCreateListDialog();
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-              ),
-              child: const Text('Create New List'),
+          const SizedBox(height: 4),
+          Text(
+            'RS ${amount.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: color,
             ),
           ),
         ],
@@ -111,44 +214,41 @@ class _ListsScreenState extends State<ListsScreen> {
     );
   }
 
-  void _showCreateListDialog() {
-    final TextEditingController nameController = TextEditingController();
+  IconData _getCategoryIcon(String category) {
+    switch (category.toLowerCase()) {
+      case 'monthly bills':
+        return Icons.receipt_outlined;
+      case 'subscriptions':
+        return Icons.subscriptions_outlined;
+      case 'grocery shopping':
+        return Icons.shopping_basket_outlined;
+      case 'dining out':
+        return Icons.restaurant_outlined;
+      case 'salary':
+        return Icons.account_balance_wallet_outlined;
+      case 'transport':
+        return Icons.directions_car_outlined;
+      default:
+        return Icons.category_outlined;
+    }
+  }
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Create New List'),
-        content: TextField(
-          controller: nameController,
-          decoration: const InputDecoration(
-            labelText: 'List Name',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (nameController.text.isNotEmpty) {
-                setState(() {
-                  _transactionLists.add({
-                    'name': nameController.text,
-                    'count': 0,
-                    'total': 0.0,
-                    'icon': Icons.list,
-                    'color': Colors.primaries[_transactionLists.length % Colors.primaries.length],
-                  });
-                });
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Create'),
-          ),
-        ],
-      ),
-    );
+  Color _getCategoryColor(String category) {
+    switch (category.toLowerCase()) {
+      case 'monthly bills':
+        return Colors.blue;
+      case 'subscriptions':
+        return Colors.purple;
+      case 'grocery shopping':
+        return Colors.green;
+      case 'dining out':
+        return Colors.orange;
+      case 'salary':
+        return Colors.teal;
+      case 'transport':
+        return Colors.amber;
+      default:
+        return Colors.blueGrey;
+    }
   }
 }
