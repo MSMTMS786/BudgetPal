@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:expense_tracker/model/model.dart';
 import 'package:expense_tracker/model/shared_pref_helper.dart';
+import 'package:expense_tracker/controller/budget_controller.dart';
 
 class TransactionController extends GetxController {
   // Observable variables
@@ -34,6 +35,11 @@ class TransactionController extends GetxController {
     transactions.value = loadedTransactions;
     calculateBalances();
     isLoading.value = false;
+    
+    // Update budget spent amounts if BudgetController exists
+    if (Get.isRegistered<BudgetController>()) {
+      Get.find<BudgetController>().updateSpentAmounts();
+    }
   }
 
   void calculateBalances() {
@@ -60,6 +66,11 @@ class TransactionController extends GetxController {
     transactions.add(transaction);
     calculateBalances();
     saveTransactions();
+    
+    // Update budget spent amounts
+    if (Get.isRegistered<BudgetController>()) {
+      Get.find<BudgetController>().updateSpentAmounts();
+    }
   }
 
   void updateTransaction(String id, Transaction updatedTransaction) {
@@ -68,6 +79,11 @@ class TransactionController extends GetxController {
       transactions[index] = updatedTransaction;
       calculateBalances();
       saveTransactions();
+      
+      // Update budget spent amounts
+      if (Get.isRegistered<BudgetController>()) {
+        Get.find<BudgetController>().updateSpentAmounts();
+      }
     }
   }
 
@@ -75,6 +91,18 @@ class TransactionController extends GetxController {
     transactions.removeAt(index);
     calculateBalances();
     saveTransactions();
+    
+    // Update budget spent amounts
+    if (Get.isRegistered<BudgetController>()) {
+      Get.find<BudgetController>().updateSpentAmounts();
+    }
+  }
+
+  // Get transactions by category
+  List<Transaction> getTransactionsByCategory(String category) {
+    return transactions.where((tx) => 
+      tx.category.toLowerCase() == category.toLowerCase()
+    ).toList();
   }
 
   void saveTransactions() {

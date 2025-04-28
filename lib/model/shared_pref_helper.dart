@@ -1,49 +1,51 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../model/model.dart'; // Ensure correct path
+import 'package:expense_tracker/model/model.dart';
 
 class SharedPrefsHelper {
-  static const String _transactionsKey = 'transactions';
+  // Keys
+  static const String transactionKey = 'transactions';
+  static const String budgetKey = 'budgets';
 
-  // Save Transactions
-  static Future<void> saveTransactions(List<Transaction> transactions) async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> encodedTransactions = transactions.map((t) => jsonEncode({
-          'id': t.id,
-          'amount': t.amount,
-          'isExpense': t.isExpense,
-          'category': t.category,
-          'description': t.description,
-          'date': t.date.toIso8601String(),
-          'paymentMethod': t.paymentMethod,
-        })).toList();
-    await prefs.setStringList(_transactionsKey, encodedTransactions);
-  }
-
-  // Load Transactions
+  // Transaction methods
   static Future<List<Transaction>> loadTransactions() async {
     final prefs = await SharedPreferences.getInstance();
-    List<String>? storedTransactions = prefs.getStringList(_transactionsKey);
-
-    if (storedTransactions == null) return [];
-
-    return storedTransactions.map((t) {
-      final decoded = jsonDecode(t);
-      return Transaction(
-        id: decoded['id'],
-        amount: decoded['amount'],
-        isExpense: decoded['isExpense'],
-        category: decoded['category'],
-        description: decoded['description'],
-        date: DateTime.parse(decoded['date']),
-        paymentMethod: decoded['paymentMethod'],
-      );
+    final transactionsJson = prefs.getStringList(transactionKey) ?? [];
+    
+    return transactionsJson.map((json) {
+      final map = jsonDecode(json);
+      return Transaction.fromJson(map);
     }).toList();
   }
 
-  // Clear Transactions
-  static Future<void> clearTransactions() async {
+  static Future<void> saveTransactions(List<Transaction> transactions) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_transactionsKey);
+    
+    final transactionsJson = transactions.map((tx) {
+      return jsonEncode(tx.toJson());
+    }).toList();
+    
+    await prefs.setStringList(transactionKey, transactionsJson);
+  }
+
+  // Budget methods
+  static Future<List<Budget>> loadBudgets() async {
+    final prefs = await SharedPreferences.getInstance();
+    final budgetsJson = prefs.getStringList(budgetKey) ?? [];
+    
+    return budgetsJson.map((json) {
+      final map = jsonDecode(json);
+      return Budget.fromJson(map);
+    }).toList();
+  }
+
+  static Future<void> saveBudgets(List<Budget> budgets) async {
+    final prefs = await SharedPreferences.getInstance();
+    
+    final budgetsJson = budgets.map((budget) {
+      return jsonEncode(budget.toJson());
+    }).toList();
+    
+    await prefs.setStringList(budgetKey, budgetsJson);
   }
 }
