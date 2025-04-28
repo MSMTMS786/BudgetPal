@@ -75,7 +75,7 @@ class _CardsScreenState extends State<CardsScreen>
         children: [
           const SizedBox(height: 20),
           SizedBox(
-            height: 220,
+            height: 190,
             child: PageView.builder(
               controller: _pageController,
               itemCount: _cards.length,
@@ -199,9 +199,9 @@ class _CardsScreenState extends State<CardsScreen>
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      ),
+      // shape: const RoundedRectangleBorder(
+      //   borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      // ),
       builder:
           (context) => Padding(
             padding: const EdgeInsets.all(20),

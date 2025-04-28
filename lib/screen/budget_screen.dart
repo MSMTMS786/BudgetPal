@@ -4,7 +4,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:get/get.dart';
 import 'package:expense_tracker/model/model.dart';
 import 'package:expense_tracker/controller/budget_controller.dart';
-import 'package:uuid/uuid.dart';
 
 class SetBudgetScreen extends StatefulWidget {
   const SetBudgetScreen({Key? key}) : super(key: key);
